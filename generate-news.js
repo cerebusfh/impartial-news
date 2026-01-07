@@ -59,7 +59,7 @@ async function generateNews() {
           content: prompt
         }
       ],
-      temperature: 0.3,
+      //temperature: 0.3,
     });
 
     const htmlContent = completion.choices[0].message.content;
