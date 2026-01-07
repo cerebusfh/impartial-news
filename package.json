@@ -1,0 +1,14 @@
+{
+  "name": "impartial-news-generator",
+  "version": "1.0.0",
+  "description": "Automated impartial news generator",
+  "main": "generate-news.js",
+  "scripts": {
+    "start": "node generate-news.js",
+    "generate": "node generate-news.js"
+  },
+  "dependencies": {
+    "openai": "^4.20.0",
+    "node-cron": "^3.0.3"
+  }
+}
