@@ -48,7 +48,7 @@ async function generateNews() {
     const prompt = getPrompt();
     
     const completion = await openai.chat.completions.create({
-      model: "gpt-5.2-chat-latest",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
