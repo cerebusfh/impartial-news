@@ -87,6 +87,7 @@ async function generateNews() {
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 16000,
+      tools: [{ type: 'web_search_20241111' }],
       messages: [
         {
           role: 'user',
@@ -130,9 +131,7 @@ async function generateNews() {
   }
 }
 
-// Run immediately on start
-generateNews();
-
+// Only run on schedule, not on startup (to avoid infinite loop)
 // Schedule to run daily at 6 AM UTC
 cron.schedule('0 6 * * *', () => {
   console.log('Running scheduled news generation...');
@@ -141,4 +140,5 @@ cron.schedule('0 6 * * *', () => {
 
 // Keep the process alive
 console.log('News generator started. Will run daily at 6 AM UTC.');
+console.log('Next run will be at 6 AM UTC.');
 console.log('Press Ctrl+C to stop.');
