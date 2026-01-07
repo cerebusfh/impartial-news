@@ -11,4 +11,7 @@
     "openai": "^4.20.0",
     "node-cron": "^3.0.3"
   }
+  "nixpacks": {
+     "packages": ["nodejs", "git"]
+  }
 }
