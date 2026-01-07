@@ -1,6 +1,5 @@
 const OpenAI = require('openai');
 const fs = require('fs');
-const { execSync } = require('child_process');
 const cron = require('node-cron');
 
 // Initialize OpenAI
@@ -8,33 +7,67 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Configure git with GitHub token
-function configureGit() {
-  const token = process.env.GITHUB_TOKEN;
-  const repoUrl = `https://${token}@github.com/cerebusfh/impartial-news.git`;
-  
-  try {
-    execSync('git config user.email "news-bot@impartial-news.app"');
-    execSync('git config user.name "News Bot"');
-    execSync(`git remote set-url origin ${repoUrl}`);
-  } catch (error) {
-    console.error('Git config error:', error.message);
-  }
-}
+// GitHub configuration
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_OWNER = 'cerebusfh';
+const GITHUB_REPO = 'impartial-news';
+const FILE_PATH = 'index.html';
 
 // Read the prompt from file
 function getPrompt() {
   return fs.readFileSync('./prompt.md', 'utf8');
 }
 
-// Push changes to GitHub
-function pushToGitHub() {
+// Push file to GitHub using API
+async function pushToGitHub(content) {
   try {
     console.log('Pushing to GitHub...');
-    execSync('git add index.html');
-    execSync(`git commit -m "Update news - ${new Date().toISOString()}"`);
-    execSync('git push origin main');
-    console.log('Successfully pushed to GitHub!');
+    
+    // Get current file SHA (required for updating)
+    const getFileResponse = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'News-Generator-Bot'
+        }
+      }
+    );
+    
+    let sha = null;
+    if (getFileResponse.ok) {
+      const fileData = await getFileResponse.json();
+      sha = fileData.sha;
+    }
+    
+    // Update file
+    const updateResponse = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+          'User-Agent': 'News-Generator-Bot'
+        },
+        body: JSON.stringify({
+          message: `Update news - ${new Date().toISOString()}`,
+          content: Buffer.from(content).toString('base64'),
+          sha: sha,
+          branch: 'main'
+        })
+      }
+    );
+    
+    if (updateResponse.ok) {
+      console.log('Successfully pushed to GitHub!');
+    } else {
+      const error = await updateResponse.text();
+      console.error('GitHub API error:', error);
+    }
+    
   } catch (error) {
     console.error('Error pushing to GitHub:', error.message);
   }
@@ -58,8 +91,7 @@ async function generateNews() {
           role: "user",
           content: prompt
         }
-      ],
-      //temperature: 0.3,
+      ]
     });
 
     const htmlContent = completion.choices[0].message.content;
@@ -72,22 +104,19 @@ async function generateNews() {
       .replace(/â€"/g, '—')
       .replace(/â€"/g, '–');
     
-    // Write to index.html
+    // Write to index.html locally (for debugging)
     fs.writeFileSync('./index.html', cleanedHtml);
     
     console.log('News generated successfully!');
     console.log(`Generated at: ${new Date().toISOString()}`);
     
-    // Push to GitHub
-    pushToGitHub();
+    // Push to GitHub using API
+    await pushToGitHub(cleanedHtml);
     
   } catch (error) {
     console.error('Error generating news:', error);
   }
 }
-
-// Configure git on startup
-configureGit();
 
 // Run immediately on start
 generateNews();
