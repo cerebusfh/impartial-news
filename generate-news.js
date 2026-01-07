@@ -93,7 +93,7 @@ async function generateNews() {
   try {
     const prompt = getPrompt();
     
-const message = await anthropic.messages.create({
+    const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 16000,
       tools: [
@@ -106,9 +106,15 @@ const message = await anthropic.messages.create({
         {
           role: 'user',
           content: prompt
-        }      ]
+        }
+      ]
     });
 
+    // Log the full response for debugging
+    console.log('Response type:', message.stop_reason);
+    console.log('Content blocks:', message.content.length);
+    console.log('First 500 chars:', message.content[0].text.substring(0, 500));
+    
     // Extract HTML from Claude's response
     let htmlContent = message.content[0].text;
     
@@ -118,6 +124,8 @@ const message = await anthropic.messages.create({
     } else if (htmlContent.includes('```')) {
       htmlContent = htmlContent.split('```')[1].split('```')[0].trim();
     }
+    
+    console.log('Extracted HTML length:', htmlContent.length);
     
     // Clean up encoding issues (just in case)
     const cleanedHtml = htmlContent
