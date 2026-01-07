@@ -1,6 +1,15 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const cron = require('node-cron');
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Enable CORS for Vercel domain
+app.use(cors());
+app.use(express.json());
 
 // Initialize Claude
 console.log('Checking for ANTHROPIC_API_KEY...');
@@ -131,6 +140,25 @@ async function generateNews() {
   }
 }
 
+// HTTP endpoint to trigger manual generation
+app.get('/generate', async (req, res) => {
+  console.log('Manual generation triggered via HTTP');
+  res.json({ status: 'started', message: 'News generation started' });
+  
+  // Run generation asynchronously (don't block response)
+  generateNews().catch(err => console.error('Generation error:', err));
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', message: 'News generator is running' });
+});
+
+// Start Express server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 // Only run on schedule, not on startup (to avoid infinite loop)
 // Schedule to run daily at 6 AM UTC
 cron.schedule('0 6 * * *', () => {
@@ -141,4 +169,4 @@ cron.schedule('0 6 * * *', () => {
 // Keep the process alive
 console.log('News generator started. Will run daily at 6 AM UTC.');
 console.log('Next run will be at 6 AM UTC.');
-console.log('Press Ctrl+C to stop.');
+console.log('Manual generation available at /generate endpoint');
