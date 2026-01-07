@@ -93,16 +93,20 @@ async function generateNews() {
   try {
     const prompt = getPrompt();
     
-    const message = await anthropic.messages.create({
+const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 16000,
-      tools: [{ type: 'web_search_20250305' }],
+      tools: [
+        {
+          type: 'web_search_20250305',
+          name: 'web_search'
+        }
+      ],
       messages: [
         {
           role: 'user',
           content: prompt
-        }
-      ]
+        }      ]
     });
 
     // Extract HTML from Claude's response
