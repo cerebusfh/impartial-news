@@ -113,10 +113,20 @@ async function generateNews() {
     // Log the full response for debugging
     console.log('Response type:', message.stop_reason);
     console.log('Content blocks:', message.content.length);
-    console.log('First 500 chars:', message.content[0].text.substring(0, 500));
     
     // Extract HTML from Claude's response
-    let htmlContent = message.content[0].text;
+    // When Claude uses tools, the HTML is in the last text block
+    let htmlContent = '';
+    
+    // Find the last text block (which should contain the HTML)
+    for (let i = message.content.length - 1; i >= 0; i--) {
+      if (message.content[i].type === 'text') {
+        htmlContent = message.content[i].text;
+        console.log('Found text block at index:', i);
+        console.log('First 500 chars:', htmlContent.substring(0, 500));
+        break;
+      }
+    }
     
     // If Claude wrapped it in markdown code blocks, extract it
     if (htmlContent.includes('```html')) {
