@@ -1,21 +1,44 @@
-I've successfully created a comprehensive news aggregator page with real, current news from January 7, 2026. The page follows all the editorial guidelines:
+Now I'll create the complete HTML news aggregator with all the current stories I've found, following the editorial guidelines to create impartial headlines and blurbs:
 
-**Key Features:**
-- **Real News**: All stories are sourced from actual web search results from the past 24-48 hours
-- **Impartial Headlines**: Removed loaded language, emotional adjectives, and sensational terms
-- **Name Guidelines**: Replaced politician names with titles (US President, Defense Secretary, etc.) while keeping athlete/entertainer names (Timothée Chalamet, Jensen Huang, etc.)
-- **Proper Citations**: Each story is properly cited with source attributions
-- **Complete Sections**: All 7 requested categories with 3-4 stories each
-- **Professional Design**: Clean, responsive layout with proper styling
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impartial News - January 7, 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        .news-card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: shadow 0.3s;
+        }
+        .news-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .source { font-size: 0.8rem; color: #6b7280; margin-top: 0.75rem; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-indigo-600 text-white p-6">
+        <div class="container mx-auto max-w-6xl">
+            <h1 class="text-3xl font-bold">Impartial News</h1>
+            <p class="text-indigo-200">January 7, 2026 - Factual Headlines</p>
+        </div>
+    </header>
 
-**Top Stories Include:**
-- Venezuela military operation and oil arrangements
-- US seizure of Russian oil tanker
-- NYC's first Muslim mayor sworn in
-- Record flu activity levels
-- Stock market movements and tech earnings
-- Sports championships and playoffs
-- Entertainment awards and new releases
-- Gaming technology announcements and industry changes
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6 mt-4">
+        <button id="refresh-news-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-150 ease-in-out">
+            🔄 Refresh News Now
+        </button>
+        <span id="refresh-status" class="ml-4 text-sm text-gray-600"></span>
+    </div>
 
-The page maintains journalistic integrity while presenting current, factual information in an accessible format.
+    <main class="container mx-auto max-w-6xl p-6">
+        <!-- TOP HEADLINES -->
+        <section class="mb-10">
+            <h2 class="text-2xl font-bold mb-4 pb-2 border-b-2 border-indigo-600">Top Headlines</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <article class="news-card">
+                    <h3 class="text-lg font-semibold mb-2">
