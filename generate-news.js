@@ -1,10 +1,10 @@
-const OpenAI = require('openai');
+const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const cron = require('node-cron');
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+// Initialize Claude
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 // GitHub configuration
@@ -73,30 +73,35 @@ async function pushToGitHub(content) {
   }
 }
 
-// Generate news using ChatGPT
+// Generate news using Claude
 async function generateNews() {
-  console.log('Starting news generation...');
+  console.log('Starting news generation with Claude...');
   
   try {
     const prompt = getPrompt();
     
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 16000,
       messages: [
         {
-          role: "system",
-          content: "You are an impartial news editor that searches the web for current news and generates factual, neutral headlines."
-        },
-        {
-          role: "user",
+          role: 'user',
           content: prompt
         }
       ]
     });
 
-    const htmlContent = completion.choices[0].message.content;
+    // Extract HTML from Claude's response
+    let htmlContent = message.content[0].text;
     
-    // Clean up encoding issues
+    // If Claude wrapped it in markdown code blocks, extract it
+    if (htmlContent.includes('```html')) {
+      htmlContent = htmlContent.split('```html')[1].split('```')[0].trim();
+    } else if (htmlContent.includes('```')) {
+      htmlContent = htmlContent.split('```')[1].split('```')[0].trim();
+    }
+    
+    // Clean up encoding issues (just in case)
     const cleanedHtml = htmlContent
       .replace(/â€™/g, "'")
       .replace(/â€œ/g, '"')
@@ -115,6 +120,9 @@ async function generateNews() {
     
   } catch (error) {
     console.error('Error generating news:', error);
+    if (error.response) {
+      console.error('Error details:', error.response.data);
+    }
   }
 }
 
