@@ -3,6 +3,10 @@ const fs = require('fs');
 const cron = require('node-cron');
 
 // Initialize Claude
+console.log('Checking for ANTHROPIC_API_KEY...');
+console.log('API Key exists:', !!process.env.ANTHROPIC_API_KEY);
+console.log('API Key length:', process.env.ANTHROPIC_API_KEY?.length || 0);
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
