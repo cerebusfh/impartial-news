@@ -115,17 +115,33 @@ async function generateNews() {
     console.log('Content blocks:', message.content.length);
     
     // Extract HTML from Claude's response
-    // When Claude uses tools, the HTML is in the last text block
+    // Look through all text blocks to find the one with HTML
     let htmlContent = '';
     
-    // Find the last text block (which should contain the HTML)
-    for (let i = message.content.length - 1; i >= 0; i--) {
+    for (let i = 0; i < message.content.length; i++) {
       if (message.content[i].type === 'text') {
-        htmlContent = message.content[i].text;
-        console.log('Found text block at index:', i);
-        console.log('First 500 chars:', htmlContent.substring(0, 500));
-        break;
+        const text = message.content[i].text;
+        
+        // Check if this block contains HTML (look for DOCTYPE or <html>)
+        if (text.includes('<!DOCTYPE html>') || text.includes('<html')) {
+          htmlContent = text;
+          console.log('Found HTML in block:', i);
+          console.log('HTML length:', text.length);
+          break;
+        }
       }
+    }
+    
+    // If we didn't find HTML in any block, log all blocks for debugging
+    if (!htmlContent) {
+      console.log('ERROR: No HTML found in any block!');
+      for (let i = 0; i < message.content.length; i++) {
+        console.log(`Block ${i} type:`, message.content[i].type);
+        if (message.content[i].type === 'text') {
+          console.log(`Block ${i} preview:`, message.content[i].text.substring(0, 200));
+        }
+      }
+      throw new Error('No HTML content found in Claude response');
     }
     
     // If Claude wrapped it in markdown code blocks, extract it
@@ -135,7 +151,7 @@ async function generateNews() {
       htmlContent = htmlContent.split('```')[1].split('```')[0].trim();
     }
     
-    console.log('Extracted HTML length:', htmlContent.length);
+    console.log('Final extracted HTML length:', htmlContent.length);
     
     // Clean up encoding issues (just in case)
     const cleanedHtml = htmlContent
