@@ -1,0 +1,68 @@
+const OpenAI = require('openai');
+const fs = require('fs');
+const cron = require('node-cron');
+
+// Initialize OpenAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+// Read the prompt from file
+function getPrompt() {
+  return fs.readFileSync('./prompt.md', 'utf8');
+}
+
+// Generate news using ChatGPT
+async function generateNews() {
+  console.log('Starting news generation...');
+  
+  try {
+    const prompt = getPrompt();
+    
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4-turbo-preview",
+      messages: [
+        {
+          role: "system",
+          content: "You are an impartial news editor that searches the web for current news and generates factual, neutral headlines."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.3,
+    });
+
+    const htmlContent = completion.choices[0].message.content;
+    
+    // Clean up encoding issues
+    const cleanedHtml = htmlContent
+      .replace(/â€™/g, "'")
+      .replace(/â€œ/g, '"')
+      .replace(/â€/g, '"')
+      .replace(/â€"/g, '—');
+    
+    // Write to index.html
+    fs.writeFileSync('./index.html', cleanedHtml);
+    
+    console.log('News generated successfully!');
+    console.log(`Generated at: ${new Date().toISOString()}`);
+    
+  } catch (error) {
+    console.error('Error generating news:', error);
+  }
+}
+
+// Run immediately on start
+generateNews();
+
+// Schedule to run daily at 6 AM UTC
+cron.schedule('0 6 * * *', () => {
+  console.log('Running scheduled news generation...');
+  generateNews();
+});
+
+// Keep the process alive
+console.log('News generator started. Will run daily at 6 AM UTC.');
+console.log('Press Ctrl+C to stop.');
