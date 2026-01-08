@@ -28,7 +28,23 @@ const FILE_PATH = 'index.html';
 
 // Read prompts from files
 function getResearchPrompt() {
-  return fs.readFileSync('./research-prompt.md', 'utf8');
+  const prompt = fs.readFileSync('./research-prompt.md', 'utf8');
+  
+  // Replace date placeholders with actual current date
+  const now = new Date();
+  const dateString = now.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  const monthYear = now.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long'
+  });
+  
+  return prompt
+    .replace(/\[TODAY_DATE\]/g, dateString)
+    .replace(/\[MONTH_YEAR\]/g, monthYear);
 }
 
 function getHtmlPrompt() {
