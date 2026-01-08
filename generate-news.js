@@ -220,6 +220,14 @@ async function generateHtml(newsData) {
     
     console.log('Final HTML length:', htmlContent.length);
     
+    // Add timestamp to HTML
+    const timestamp = new Date().toLocaleString('en-US', { 
+      timeZone: 'America/Los_Angeles',
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
+    htmlContent = htmlContent.replace('[TIMESTAMP]', timestamp);
+    
     return htmlContent;
     
   } catch (error) {
@@ -280,7 +288,7 @@ app.get('/generate', async (req, res) => {
   res.json({ status: 'started', message: 'News generation started' });
   
   // Run generation asynchronously
-  generateNews(true).catch(err => console.error('Generation error:', err));
+  generateNews().catch(err => console.error('Generation error:', err));
 });
 
 // Health check endpoint
@@ -300,6 +308,6 @@ cron.schedule('0 14 * * *', () => {
 });
 
 // Keep the process alive
-console.log('News generator started - LOCAL TEST. Will run daily at 6 AM PST (2 PM UTC).');
+console.log('News generator started. Will run daily at 6 AM PST (2 PM UTC).');
 console.log('Next run will be at 6 AM PST.');
 console.log('Manual generation available at /generate endpoint');

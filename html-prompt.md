@@ -33,6 +33,7 @@ Use this exact structure:
         <div class="container mx-auto max-w-6xl">
             <h1 class="text-3xl font-bold">Impartial News</h1>
             <p class="text-indigo-200">[DATE] - Factual Headlines</p>
+            <p class="text-indigo-300 text-sm mt-1">Last updated: [TIMESTAMP]</p>
         </div>
     </header>
 
@@ -119,16 +120,16 @@ Use this exact structure:
         
         btn.disabled = true;
         btn.textContent = '⏳ Generating...';
-        status.textContent = 'This may take 2-3 minutes...';
+        status.textContent = 'This may take 10-15 minutes...';
         
         try {
             const response = await fetch('https://impartial-news-production.up.railway.app/generate');
             const data = await response.json();
             
-            status.textContent = '✅ ' + data.message + ' - Page will refresh in 60 seconds';
+            status.textContent = '✅ ' + data.message + ' - Page will refresh in 2 minutes';
             
-            // Refresh page after 60 seconds to show new content
-            setTimeout(() => location.reload(), 60000);
+            // Refresh page after 2 minutes to show new content
+            setTimeout(() => location.reload(), 120000);
         } catch (error) {
             status.textContent = '❌ Error: ' + error.message;
             btn.disabled = false;
