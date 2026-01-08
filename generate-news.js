@@ -217,6 +217,11 @@ async function generateNews() {
     fs.writeFileSync('./news-data.json', JSON.stringify(newsData, null, 2));
     console.log('Research data saved to news-data.json');
     
+    // Wait 75 seconds for rate limit to reset
+    console.log('Waiting 75 seconds for rate limit reset...');
+    await new Promise(resolve => setTimeout(resolve, 75000));
+    console.log('Proceeding with HTML generation...');
+    
     // Step 2: Generate HTML
     const htmlContent = await generateHtml(newsData);
     
