@@ -27,8 +27,8 @@ const GITHUB_REPO = 'impartial-news';
 const FILE_PATH = 'index.html';
 
 // Read prompts from files
-function getResearchPrompt() {
-  const prompt = fs.readFileSync('./research-prompt.md', 'utf8');
+function getResearchPrompt(quickMode = false) {
+  let prompt = fs.readFileSync('./research-prompt.md', 'utf8');
   
   // Replace date placeholders with actual current date
   const now = new Date();
@@ -42,9 +42,16 @@ function getResearchPrompt() {
     month: 'long'
   });
   
-  return prompt
+  prompt = prompt
     .replace(/\[TODAY_DATE\]/g, dateString)
     .replace(/\[MONTH_YEAR\]/g, monthYear);
+  
+  // Add quick mode instruction if enabled
+  if (quickMode) {
+    prompt += '\n\n**QUICK MODE**: Limit to 2-3 searches per category instead of comprehensive coverage. Prioritize speed over thoroughness.';
+  }
+  
+  return prompt;
 }
 
 function getHtmlPrompt() {
@@ -107,15 +114,15 @@ async function pushToGitHub(content) {
 }
 
 // STEP 1: Research and gather news stories
-async function researchNews() {
-  console.log('STEP 1: Researching news stories...');
+async function researchNews(quickMode = false) {
+  console.log(`STEP 1: Researching news stories... (${quickMode ? 'QUICK' : 'FULL'})`);
   
   try {
-    const researchPrompt = getResearchPrompt();
+    const researchPrompt = getResearchPrompt(quickMode);
     
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 16000,
+      max_tokens: quickMode ? 12000 : 16000,
       tools: [
         {
           type: 'web_search_20250305',
@@ -222,20 +229,21 @@ async function generateHtml(newsData) {
 }
 
 // Main generation function
-async function generateNews() {
-  console.log('Starting two-step news generation...');
+async function generateNews(quickMode = false) {
+  console.log(`Starting two-step news generation... (${quickMode ? 'QUICK MODE' : 'FULL MODE'})`);
   
   try {
     // Step 1: Research
-    const newsData = await researchNews();
+    const newsData = await researchNews(quickMode);
     
     // Save research data for debugging
     fs.writeFileSync('./news-data.json', JSON.stringify(newsData, null, 2));
     console.log('Research data saved to news-data.json');
     
-    // Wait 2 minutes for rate limit to reset
-    console.log('Waiting 2 minutes for rate limit reset...');
-    await new Promise(resolve => setTimeout(resolve, 120000));
+    // Wait time depends on mode
+    const waitTime = quickMode ? 150000 : 420000; // 2.5min for quick, 7min for full
+    console.log(`Waiting ${waitTime/1000} seconds for rate limit reset...`);
+    await new Promise(resolve => setTimeout(resolve, waitTime));
     console.log('Proceeding with HTML generation...');
     
     // Step 2: Generate HTML
@@ -285,10 +293,10 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Schedule to run daily at 6 AM UTC
+// Schedule to run daily at 6 AM UTC (FULL MODE)
 cron.schedule('0 6 * * *', () => {
-  console.log('Running scheduled news generation...');
-  generateNews();
+  console.log('Running scheduled news generation (FULL MODE)...');
+  generateNews(false);
 });
 
 // Keep the process alive
