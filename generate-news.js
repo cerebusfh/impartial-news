@@ -26,9 +26,13 @@ const GITHUB_OWNER = 'cerebusfh';
 const GITHUB_REPO = 'impartial-news';
 const FILE_PATH = 'index.html';
 
-// Read the prompt from file
-function getPrompt() {
-  return fs.readFileSync('./prompt.md', 'utf8');
+// Read prompts from files
+function getResearchPrompt() {
+  return fs.readFileSync('./research-prompt.md', 'utf8');
+}
+
+function getHtmlPrompt() {
+  return fs.readFileSync('./html-prompt.md', 'utf8');
 }
 
 // Push file to GitHub using API
@@ -86,20 +90,16 @@ async function pushToGitHub(content) {
   }
 }
 
-// Generate news using Claude
-async function generateNews() {
-  console.log('Starting news generation with Claude...');
+// STEP 1: Research and gather news stories
+async function researchNews() {
+  console.log('STEP 1: Researching news stories...');
   
   try {
-    const prompt = getPrompt();
+    const researchPrompt = getResearchPrompt();
     
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 32000,  // Increased token limit
-      thinking: {
-        type: 'enabled',
-        budget_tokens: 8000
-      },
+      max_tokens: 16000,
       tools: [
         {
           type: 'web_search_20250305',
@@ -109,55 +109,118 @@ async function generateNews() {
       messages: [
         {
           role: 'user',
-          content: prompt
+          content: researchPrompt
         }
       ]
     });
-
-    // Log the full response for debugging
-    console.log('Response type:', message.stop_reason);
-    console.log('Content blocks:', message.content.length);
     
-    // Extract HTML from Claude's response
-    // Look through all text blocks to find the one with HTML
-    let htmlContent = '';
+    console.log('Research complete. Content blocks:', message.content.length);
     
+    // Find the JSON in the response
+    let newsData = '';
     for (let i = 0; i < message.content.length; i++) {
       if (message.content[i].type === 'text') {
         const text = message.content[i].text;
         
-        // Check if this block contains HTML (look for DOCTYPE or <html>)
-        if (text.includes('<!DOCTYPE html>') || text.includes('<html')) {
-          htmlContent = text;
-          console.log('Found HTML in block:', i);
-          console.log('HTML length:', text.length);
+        // Look for JSON (either wrapped in code blocks or raw)
+        if (text.includes('{') && text.includes('"categories"')) {
+          newsData = text;
+          console.log('Found news data in block:', i);
           break;
         }
       }
     }
     
-    // If we didn't find HTML in any block, log all blocks for debugging
-    if (!htmlContent) {
-      console.log('ERROR: No HTML found in any block!');
-      for (let i = 0; i < message.content.length; i++) {
-        console.log(`Block ${i} type:`, message.content[i].type);
-        if (message.content[i].type === 'text') {
-          console.log(`Block ${i} preview:`, message.content[i].text.substring(0, 200));
-        }
-      }
-      throw new Error('No HTML content found in Claude response');
+    // Extract JSON from markdown code blocks if present
+    if (newsData.includes('```json')) {
+      newsData = newsData.split('```json')[1].split('```')[0].trim();
+    } else if (newsData.includes('```')) {
+      newsData = newsData.split('```')[1].split('```')[0].trim();
     }
     
-    // If Claude wrapped it in markdown code blocks, extract it
+    const parsedData = JSON.parse(newsData);
+    console.log('Parsed news data:', Object.keys(parsedData.categories).length, 'categories');
+    
+    return parsedData;
+    
+  } catch (error) {
+    console.error('Error in research phase:', error);
+    throw error;
+  }
+}
+
+// STEP 2: Generate HTML from research data
+async function generateHtml(newsData) {
+  console.log('STEP 2: Generating HTML from research...');
+  
+  try {
+    const htmlPrompt = getHtmlPrompt();
+    const fullPrompt = `${htmlPrompt}\n\nHere is the news data to convert to HTML:\n\n${JSON.stringify(newsData, null, 2)}`;
+    
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 32000,
+      messages: [
+        {
+          role: 'user',
+          content: fullPrompt
+        }
+      ]
+    });
+    
+    console.log('HTML generation complete. Content blocks:', message.content.length);
+    
+    // Extract HTML from response
+    let htmlContent = '';
+    for (let i = 0; i < message.content.length; i++) {
+      if (message.content[i].type === 'text') {
+        const text = message.content[i].text;
+        
+        if (text.includes('<!DOCTYPE html>') || text.includes('<html')) {
+          htmlContent = text;
+          console.log('Found HTML in block:', i);
+          break;
+        }
+      }
+    }
+    
+    if (!htmlContent) {
+      throw new Error('No HTML found in response');
+    }
+    
+    // Extract from markdown if needed
     if (htmlContent.includes('```html')) {
       htmlContent = htmlContent.split('```html')[1].split('```')[0].trim();
     } else if (htmlContent.includes('```')) {
       htmlContent = htmlContent.split('```')[1].split('```')[0].trim();
     }
     
-    console.log('Final extracted HTML length:', htmlContent.length);
+    console.log('Final HTML length:', htmlContent.length);
     
-    // Clean up encoding issues (just in case)
+    return htmlContent;
+    
+  } catch (error) {
+    console.error('Error in HTML generation phase:', error);
+    throw error;
+  }
+}
+
+// Main generation function
+async function generateNews() {
+  console.log('Starting two-step news generation...');
+  
+  try {
+    // Step 1: Research
+    const newsData = await researchNews();
+    
+    // Save research data for debugging
+    fs.writeFileSync('./news-data.json', JSON.stringify(newsData, null, 2));
+    console.log('Research data saved to news-data.json');
+    
+    // Step 2: Generate HTML
+    const htmlContent = await generateHtml(newsData);
+    
+    // Clean up encoding issues
     const cleanedHtml = htmlContent
       .replace(/â€™/g, "'")
       .replace(/â€œ/g, '"')
@@ -165,13 +228,13 @@ async function generateNews() {
       .replace(/â€"/g, '—')
       .replace(/â€"/g, '–');
     
-    // Write to index.html locally (for debugging)
+    // Write to index.html locally
     fs.writeFileSync('./index.html', cleanedHtml);
     
     console.log('News generated successfully!');
     console.log(`Generated at: ${new Date().toISOString()}`);
     
-    // Push to GitHub using API
+    // Push to GitHub
     await pushToGitHub(cleanedHtml);
     
   } catch (error) {
@@ -187,7 +250,7 @@ app.get('/generate', async (req, res) => {
   console.log('Manual generation triggered via HTTP');
   res.json({ status: 'started', message: 'News generation started' });
   
-  // Run generation asynchronously (don't block response)
+  // Run generation asynchronously
   generateNews().catch(err => console.error('Generation error:', err));
 });
 
@@ -201,7 +264,6 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Only run on schedule, not on startup (to avoid infinite loop)
 // Schedule to run daily at 6 AM UTC
 cron.schedule('0 6 * * *', () => {
   console.log('Running scheduled news generation...');
