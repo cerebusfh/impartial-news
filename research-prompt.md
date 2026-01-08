@@ -2,7 +2,7 @@
 
 ## Critical Context
 
-**TODAY'S DATE IS [TODAY_DATE].**
+**TODAY'S DATE IS [TODAY_DATE].** 
 
 You MUST search for news from the LAST 24 HOURS. Explicitly include today's date in your searches to avoid cached results.
 
