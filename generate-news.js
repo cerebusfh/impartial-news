@@ -300,6 +300,6 @@ cron.schedule('0 14 * * *', () => {
 });
 
 // Keep the process alive
-console.log('News generator started. Will run daily at 6 AM PST (2 PM UTC).');
+console.log('News generator started - LOCAL TEST. Will run daily at 6 AM PST (2 PM UTC).');
 console.log('Next run will be at 6 AM PST.');
 console.log('Manual generation available at /generate endpoint');
