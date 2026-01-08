@@ -293,13 +293,13 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Schedule to run daily at 6 AM UTC (FULL MODE)
-cron.schedule('0 6 * * *', () => {
+// Schedule to run daily at 6 AM PST (2 PM UTC) - FULL MODE
+cron.schedule('0 14 * * *', () => {
   console.log('Running scheduled news generation (FULL MODE)...');
   generateNews(false);
 });
 
 // Keep the process alive
-console.log('News generator started. Will run daily at 6 AM UTC.');
-console.log('Next run will be at 6 AM UTC.');
+console.log('News generator started. Will run daily at 6 AM PST (2 PM UTC).');
+console.log('Next run will be at 6 AM PST.');
 console.log('Manual generation available at /generate endpoint');
