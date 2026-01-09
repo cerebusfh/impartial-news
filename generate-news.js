@@ -288,7 +288,7 @@ app.get('/generate', async (req, res) => {
   res.json({ status: 'started', message: 'News generation started' });
   
   // Run generation asynchronously
-  generateNews().catch(err => console.error('Generation error:', err));
+  generateNews(true).catch(err => console.error('Generation error:', err));
 });
 
 // Health check endpoint
