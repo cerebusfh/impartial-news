@@ -48,7 +48,7 @@ function getResearchPrompt(quickMode = false) {
   
   // Add quick mode instruction if enabled
   if (quickMode) {
-    prompt += '\n\n---\n\n**🚨 QUICK MODE ACTIVE 🚨**\n\nYou MUST perform ONLY 1 search per category (7 searches TOTAL) to avoid rate limits. Use ONLY the "Primary" search query listed for each category. Skip ALL additional searches. Work with the limited data you find.';
+    prompt += '\n\n---\n\n**🚨 QUICK MODE ACTIVE 🚨**\n\n**RATE LIMIT STRATEGY:**\n- Perform ONLY 1 search per category (7 searches TOTAL)\n- Use ONLY the "Primary" search query listed for each category\n- Work SEQUENTIALLY: Do one search, analyze results, document findings, THEN move to next category\n- DO NOT batch multiple searches rapidly - space them out by analyzing thoroughly between searches\n- This pacing helps avoid hitting the 30k tokens/minute rate limit\n\n**Process for each category:**\n1. Perform the primary search for the category\n2. Review and analyze the search results carefully\n3. Select the best stories from those results\n4. Document your selections with reasoning\n5. Then move to the next category\n\nWork with the limited data you find from these 7 searches.';
   }
   
   return prompt;
@@ -249,7 +249,9 @@ async function generateNews(quickMode = false) {
     console.log('Research data saved to news-data.json');
     
     // Wait time depends on mode
-    const waitTime = quickMode ? 150000 : 420000; // 2.5min for quick, 7min for full
+    // Quick mode uses paced searches during Phase 1, so needs less wait time
+    // Full mode does many rapid searches, so needs longer wait
+    const waitTime = quickMode ? 180000 : 420000; // 3min for quick (paced searches), 7min for full
     console.log(`Waiting ${waitTime/1000} seconds for rate limit reset...`);
     await new Promise(resolve => setTimeout(resolve, waitTime));
     console.log('Proceeding with HTML generation...');
