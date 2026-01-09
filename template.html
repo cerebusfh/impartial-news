@@ -334,13 +334,13 @@
         // Update immediately
         element.textContent = progressMessages[0];
 
-        // Then rotate every 3 seconds
+        // Then rotate every 10 seconds
         searchProgressInterval = setInterval(() => {
             searchMessageIndex = (searchMessageIndex + 1) % progressMessages.length;
             if (element) {
                 element.textContent = progressMessages[searchMessageIndex];
             }
-        }, 3000);
+        }, 10000);
     }
 
     function stopSearchProgress() {
@@ -414,7 +414,7 @@
 
     function startPolling(queryId) {
         let attempts = 0;
-        const maxAttempts = 30; // 30 attempts × 2 seconds = 60 seconds max
+        const maxAttempts = 60; // 60 attempts × 2 seconds = 120 seconds max
 
         pollInterval = setInterval(async () => {
             attempts++;
@@ -558,13 +558,13 @@
         // Update immediately
         element.innerHTML = `<p class="text-lg text-gray-600" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">${progressMessages[0]}</p>`;
 
-        // Then rotate every 3 seconds
+        // Then rotate every 10 seconds
         progressMessageInterval = setInterval(() => {
             currentMessageIndex = (currentMessageIndex + 1) % progressMessages.length;
             if (element) {
                 element.innerHTML = `<p class="text-lg text-gray-600" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">${progressMessages[currentMessageIndex]}</p>`;
             }
-        }, 3000);
+        }, 10000);
     }
 
     function stopProgressMessages() {
@@ -634,7 +634,7 @@
     // Poll for modal results
     function startModalPolling(queryId) {
         let attempts = 0;
-        const maxAttempts = 30;
+        const maxAttempts = 60; // 60 attempts × 2 seconds = 120 seconds max
 
         modalPollInterval = setInterval(async () => {
             attempts++;
