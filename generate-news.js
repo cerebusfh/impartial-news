@@ -310,7 +310,8 @@ CRITICAL EDITORIAL RULES - Follow these strictly:
       prompt += `Now answering the follow-up question: "${userQuery}"\n\n`;
     }
 
-    prompt += `Return your response as JSON in this exact format:
+    prompt += `CRITICAL: You MUST respond with ONLY valid JSON in this exact format. Do not include any explanatory text, preamble, or narrative. Just the JSON object:
+
 {
   "headline": "Neutral 8-15 word headline describing what happened",
   "summary": "2-3 paragraph factual summary with dates and context. Remove politician names and use neutral language throughout.",
@@ -319,7 +320,7 @@ CRITICAL EDITORIAL RULES - Follow these strictly:
   "related_topics": ["Related Topic 1", "Related Topic 2"]
 }
 
-Return ONLY the JSON, no other text.`;
+IMPORTANT: Start your response with { and end with }. Nothing else.`;
 
     // Call Claude API with web search
     const message = await anthropic.messages.create({
@@ -349,15 +350,34 @@ Return ONLY the JSON, no other text.`;
       }
     }
 
-    // Parse JSON from response (handle markdown code blocks)
+    // Parse JSON from response (handle markdown code blocks and find JSON)
     let jsonText = resultText;
+
+    // Try to extract from code blocks first
     if (jsonText.includes('```json')) {
       jsonText = jsonText.split('```json')[1].split('```')[0].trim();
     } else if (jsonText.includes('```')) {
       jsonText = jsonText.split('```')[1].split('```')[0].trim();
     }
 
-    const result = JSON.parse(jsonText);
+    // If no code blocks, try to find JSON object in the text
+    if (!jsonText.trim().startsWith('{')) {
+      const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonText = jsonMatch[0];
+      } else {
+        throw new Error('No valid JSON found in response. Claude may have returned narrative text instead of JSON.');
+      }
+    }
+
+    let result;
+    try {
+      result = JSON.parse(jsonText);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      console.error('Attempted to parse:', jsonText.substring(0, 200));
+      throw new Error(`Failed to parse response as JSON: ${parseError.message}`);
+    }
 
     // Clean citation markers from Claude's web_search tool (e.g., <cite index="4-2">)
     const cleanCitations = (text) => {
