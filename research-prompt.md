@@ -198,14 +198,14 @@ Return JSON in this exact structure:
 ## Story Count Requirements - CRITICAL
 
 - **Top Headlines**: EXACTLY 4 stories (required for balanced 2-column layout)
-- **U.S. News**: 3 stories
-- **World News**: 3 stories
-- **Business**: 3 stories
-- **Sports**: 3 stories
-- **Entertainment**: 3 stories
-- **Gaming**: 3 stories
+- **U.S. News**: 4 stories (2x2 column layout)
+- **World News**: 4 stories (2x2 column layout)
+- **Business**: 4 stories (2x2 column layout)
+- **Sports**: 4 stories (2x2 column layout)
+- **Entertainment**: 4 stories (2x2 column layout)
+- **Gaming**: 4 stories (2x2 column layout)
 
-If you cannot find 4 suitable stories for Top Headlines, expand your search or promote the most newsworthy story from another category.
+If you cannot find 4 suitable stories for any category, expand your search or include slightly older but still newsworthy stories from the last 48 hours.
 
 ## Source Quality
 
@@ -244,7 +244,6 @@ Before submitting your research, verify EACH story:
 2. ✅ Headline is neutral and factual (8-15 words)
 3. ✅ No inflammatory language, threats, or warnings in headline or blurb
 4. ✅ Source is reputable
-5. ✅ Top Headlines has EXACTLY 4 stories
-6. ✅ All other categories have 3 stories each
+5. ✅ ALL categories have EXACTLY 4 stories each
 
 **Now search the web thoroughly and return the JSON data.**
