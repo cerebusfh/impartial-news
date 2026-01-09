@@ -172,64 +172,82 @@ async function researchNews(quickMode = false) {
   }
 }
 
-// STEP 2: Generate HTML from research data
-async function generateHtml(newsData) {
-  console.log('STEP 2: Generating HTML from research...');
-  
+// STEP 2: Generate HTML from research data (using template - NO API CALL!)
+function generateHtml(newsData) {
+  console.log('STEP 2: Generating HTML from template (no API call)...');
+
   try {
-    const htmlPrompt = getHtmlPrompt();
-    const fullPrompt = `${htmlPrompt}\n\nHere is the news data to convert to HTML:\n\n${JSON.stringify(newsData, null, 2)}`;
-    
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 32000,
-      messages: [
-        {
-          role: 'user',
-          content: fullPrompt
-        }
-      ]
+    // Read the HTML template
+    const template = fs.readFileSync('./template.html', 'utf8');
+
+    // Helper function to create story HTML
+    const createStoryHtml = (story, isTopHeadline = false) => {
+      const headlineClass = isTopHeadline ? 'headline top-headline' : 'headline';
+      return `                <article class="news-story">
+                    <h3 class="${headlineClass}">${story.headline}</h3>
+                    <p class="blurb">${story.blurb}</p>
+                    <p class="source">${story.source}</p>
+                </article>`;
+    };
+
+    // Generate HTML for each category
+    const topHeadlines = newsData.categories.top_headlines
+      .map(story => createStoryHtml(story, true))
+      .join('\n');
+
+    const usNews = newsData.categories.us_news
+      .map(story => createStoryHtml(story))
+      .join('\n');
+
+    const worldNews = newsData.categories.world_news
+      .map(story => createStoryHtml(story))
+      .join('\n');
+
+    const business = newsData.categories.business
+      .map(story => createStoryHtml(story))
+      .join('\n');
+
+    const sports = newsData.categories.sports
+      .map(story => createStoryHtml(story))
+      .join('\n');
+
+    const entertainment = newsData.categories.entertainment
+      .map(story => createStoryHtml(story))
+      .join('\n');
+
+    const gaming = newsData.categories.gaming
+      .map(story => createStoryHtml(story))
+      .join('\n');
+
+    // Format dates
+    const date = newsData.generated_date || new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
-    
-    console.log('HTML generation complete. Content blocks:', message.content.length);
-    
-    // Extract HTML from response
-    let htmlContent = '';
-    for (let i = 0; i < message.content.length; i++) {
-      if (message.content[i].type === 'text') {
-        const text = message.content[i].text;
-        
-        if (text.includes('<!DOCTYPE html>') || text.includes('<html')) {
-          htmlContent = text;
-          console.log('Found HTML in block:', i);
-          break;
-        }
-      }
-    }
-    
-    if (!htmlContent) {
-      throw new Error('No HTML found in response');
-    }
-    
-    // Extract from markdown if needed
-    if (htmlContent.includes('```html')) {
-      htmlContent = htmlContent.split('```html')[1].split('```')[0].trim();
-    } else if (htmlContent.includes('```')) {
-      htmlContent = htmlContent.split('```')[1].split('```')[0].trim();
-    }
-    
-    console.log('Final HTML length:', htmlContent.length);
-    
-    // Add timestamp to HTML
-    const timestamp = new Date().toLocaleString('en-US', { 
+
+    const timestamp = new Date().toLocaleString('en-US', {
       timeZone: 'America/Los_Angeles',
       dateStyle: 'medium',
       timeStyle: 'short'
     });
-    htmlContent = htmlContent.replace('[TIMESTAMP]', timestamp);
-    
+
+    // Replace all placeholders in template
+    let htmlContent = template
+      .replace(/\{\{DATE\}\}/g, date)
+      .replace(/\{\{TIMESTAMP\}\}/g, timestamp)
+      .replace('{{TOP_HEADLINES}}', topHeadlines)
+      .replace('{{US_NEWS}}', usNews)
+      .replace('{{WORLD_NEWS}}', worldNews)
+      .replace('{{BUSINESS}}', business)
+      .replace('{{SPORTS}}', sports)
+      .replace('{{ENTERTAINMENT}}', entertainment)
+      .replace('{{GAMING}}', gaming);
+
+    console.log('HTML generation complete (template-based). Length:', htmlContent.length);
+
     return htmlContent;
-    
+
   } catch (error) {
     console.error('Error in HTML generation phase:', error);
     throw error;
@@ -247,17 +265,12 @@ async function generateNews(quickMode = false) {
     // Save research data for debugging
     fs.writeFileSync('./news-data.json', JSON.stringify(newsData, null, 2));
     console.log('Research data saved to news-data.json');
-    
-    // Wait time depends on mode
-    // Quick mode uses paced searches during Phase 1, so needs less wait time
-    // Full mode does many rapid searches, so needs longer wait
-    const waitTime = quickMode ? 180000 : 420000; // 3min for quick (paced searches), 7min for full
-    console.log(`Waiting ${waitTime/1000} seconds for rate limit reset...`);
-    await new Promise(resolve => setTimeout(resolve, waitTime));
-    console.log('Proceeding with HTML generation...');
-    
-    // Step 2: Generate HTML
-    const htmlContent = await generateHtml(newsData);
+
+    // No wait needed! Phase 2 uses JavaScript templating (no API call)
+    console.log('Proceeding with HTML generation (template-based, no API call)...');
+
+    // Step 2: Generate HTML (no API call, instant)
+    const htmlContent = generateHtml(newsData);
     
     // Clean up encoding issues
     const cleanedHtml = htmlContent
