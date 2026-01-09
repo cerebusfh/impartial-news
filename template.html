@@ -266,6 +266,12 @@
 
             <!-- Modal content -->
             <div id="modal-content" class="p-6">
+                <!-- Story title -->
+                <div id="modal-title" class="mb-6 pb-4 border-b-2 border-gray-200">
+                    <p class="text-xs text-gray-500 mb-2" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">EXPLORING STORY</p>
+                    <h2 id="modal-headline" class="headline text-xl" style="margin-bottom: 0;">Story Headline</h2>
+                </div>
+
                 <!-- Loading state shown first -->
                 <div id="modal-loading" class="text-center py-8">
                     <p class="text-lg text-gray-600" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">🔍 Researching story details...</p>
@@ -325,6 +331,7 @@
     let pollInterval = null;
     let searchProgressInterval = null;
     let searchMessageIndex = 0;
+    let currentSearchQuery = '';
 
     // Rotate progress messages for search box
     function startSearchProgress(element) {
@@ -370,6 +377,9 @@
             statusDiv.className = 'text-sm text-red-600 mb-4';
             return;
         }
+
+        // Store the query for display in results
+        currentSearchQuery = query;
 
         // Disable input during processing
         input.disabled = true;
@@ -469,9 +479,15 @@
         // Show results section
         resultsDiv.classList.remove('hidden');
 
-        // Create result HTML
+        // Create result HTML with query header
         const resultHtml = `
             <div class="news-story" style="padding-top: 1rem; border-top: 2px solid #e5e5e5; margin-top: 1rem;">
+                ${currentSearchQuery ? `
+                <div class="mb-4 pb-3 border-b border-gray-200">
+                    <p class="text-xs text-gray-500 mb-1" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">YOUR QUESTION</p>
+                    <p class="text-sm text-gray-700" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">"${escapeHtml(currentSearchQuery)}"</p>
+                </div>
+                ` : ''}
                 <h3 class="headline" style="font-size: 1.3rem; margin-bottom: 0.75rem;">${escapeHtml(result.headline)}</h3>
                 <div class="blurb" style="white-space: pre-wrap; margin-bottom: 0.75rem;">${escapeHtml(result.summary)}</div>
                 <div class="text-xs text-gray-600 mb-2" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
@@ -589,9 +605,15 @@
     // Open modal and fetch story details
     async function openStoryModal(headline) {
         const modal = document.getElementById('story-modal');
+        const modalHeadline = document.getElementById('modal-headline');
         const loadingDiv = document.getElementById('modal-loading');
         const resultDiv = document.getElementById('modal-result');
         const followupDiv = document.getElementById('modal-followup');
+
+        // Set the modal title to the clicked headline
+        if (modalHeadline) {
+            modalHeadline.textContent = headline;
+        }
 
         // Show modal with loading state
         modal.classList.remove('hidden');
