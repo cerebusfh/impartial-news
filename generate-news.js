@@ -359,6 +359,25 @@ Return ONLY the JSON, no other text.`;
 
     const result = JSON.parse(jsonText);
 
+    // Clean citation markers from Claude's web_search tool (e.g., <cite index="4-2">)
+    const cleanCitations = (text) => {
+      if (!text) return text;
+      return text.replace(/<cite[^>]*>/gi, '').replace(/<\/cite>/gi, '');
+    };
+
+    // Clean all text fields
+    result.headline = cleanCitations(result.headline);
+    result.summary = cleanCitations(result.summary);
+    result.last_updated = cleanCitations(result.last_updated);
+
+    if (result.sources && Array.isArray(result.sources)) {
+      result.sources = result.sources.map(s => cleanCitations(s));
+    }
+
+    if (result.related_topics && Array.isArray(result.related_topics)) {
+      result.related_topics = result.related_topics.map(t => cleanCitations(t));
+    }
+
     // Update conversation store
     const conversation = conversations.get(queryId);
     if (conversation) {
