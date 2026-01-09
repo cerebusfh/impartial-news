@@ -259,11 +259,11 @@ async function generateNews(quickMode = false) {
     
     // Clean up encoding issues
     const cleanedHtml = htmlContent
-      .replace(/â€™/g, "'")
-      .replace(/â€œ/g, '"')
-      .replace(/â€/g, '"')
-      .replace(/â€"/g, '—')
-      .replace(/â€"/g, '–');
+      .replace(/Ã¢â‚¬â„¢/g, "'")
+      .replace(/Ã¢â‚¬Å"/g, '"')
+      .replace(/Ã¢â‚¬/g, '"')
+      .replace(/Ã¢â‚¬"/g, '—')
+      .replace(/Ã¢â‚¬"/g, '—');
     
     // Write to index.html locally
     fs.writeFileSync('./index.html', cleanedHtml);
@@ -282,12 +282,19 @@ async function generateNews(quickMode = false) {
   }
 }
 
-// HTTP endpoint to trigger manual generation
+// =============================================================================
+// HTTP ENDPOINT FOR MANUAL GENERATION
+// =============================================================================
+// ⚠️  CRITICAL: The 'true' parameter MUST remain to use QUICK MODE
+// ⚠️  QUICK MODE prevents excessive token usage during testing
+// ⚠️  DO NOT CHANGE THIS TO false OR REMOVE THE PARAMETER
+// =============================================================================
 app.get('/generate', async (req, res) => {
-  console.log('Manual generation triggered via HTTP');
-  res.json({ status: 'started', message: 'News generation started' });
+  console.log('Manual generation triggered via HTTP (QUICK MODE)');
+  res.json({ status: 'started', message: 'News generation started in quick mode' });
   
-  // Run generation asynchronously
+  // Run generation asynchronously in QUICK MODE (true = quick, false = full)
+  // ⚠️  KEEP THIS AS true - DO NOT REMOVE OR CHANGE ⚠️
   generateNews(true).catch(err => console.error('Generation error:', err));
 });
 
@@ -304,10 +311,10 @@ app.listen(PORT, () => {
 // Schedule to run daily at 6 AM PST (2 PM UTC) - FULL MODE
 cron.schedule('0 14 * * *', () => {
   console.log('Running scheduled news generation (FULL MODE)...');
-  generateNews(false);
+  generateNews(false); // false = FULL MODE for scheduled runs
 });
 
 // Keep the process alive
 console.log('News generator started. Will run daily at 6 AM PST (2 PM UTC).');
 console.log('Next run will be at 6 AM PST.');
-console.log('Manual generation available at /generate endpoint');
+console.log('Manual generation available at /generate endpoint (QUICK MODE)');
