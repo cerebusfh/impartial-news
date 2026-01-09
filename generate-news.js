@@ -3,6 +3,7 @@ const fs = require('fs');
 const cron = require('node-cron');
 const express = require('express');
 const cors = require('cors');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,6 +26,16 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = 'cerebusfh';
 const GITHUB_REPO = 'impartial-news';
 const FILE_PATH = 'index.html';
+
+// Conversation storage for interactive queries
+const conversations = new Map(); // queryId → { query, result, conversationHistory, timestamp, status }
+const CONVERSATION_EXPIRY_MS = 3600000; // 1 hour
+const MAX_CONVERSATIONS = 1000; // Hard cap to prevent memory leak
+
+// Rate limiting for user queries
+const queryLimits = new Map(); // ip → [timestamps]
+const MAX_QUERIES_PER_WINDOW = 5;
+const RATE_LIMIT_WINDOW_MS = 600000; // 10 minutes
 
 // Read prompts from files
 function getResearchPrompt(quickMode = false) {
@@ -254,6 +265,130 @@ function generateHtml(newsData) {
   }
 }
 
+// Rate limiting helper
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const timestamps = queryLimits.get(ip) || [];
+  const recentQueries = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+
+  if (recentQueries.length >= MAX_QUERIES_PER_WINDOW) {
+    return false; // Rate limited
+  }
+
+  recentQueries.push(now);
+  queryLimits.set(ip, recentQueries);
+  return true;
+}
+
+// Process user query with Claude
+async function processUserQuery(queryId, userQuery, conversationHistory = []) {
+  console.log(`Processing query ${queryId}: "${userQuery}"`);
+
+  try {
+    // Build prompt with editorial guidelines for unbiased reporting
+    let prompt = `You are an impartial news researcher. A user has asked: "${userQuery}"
+
+Search the web for factual, recent information (last 24-48 hours preferred, but go back further if needed for context).
+
+CRITICAL EDITORIAL RULES - Follow these strictly:
+1. NEUTRAL LANGUAGE: No sensational verbs (warns, slams, threatens, blasts)
+2. FACTUAL REPORTING: State what happened, not opinions or speculation
+3. REMOVE POLITICIAN NAMES: Use titles only (US President, Senator, Prime Minister)
+4. KEEP OTHER NAMES: Athletes, entertainers, business leaders, victims can be named
+5. NO INFLAMMATORY QUOTES: Avoid quotes that contain threats or warnings
+6. INCLUDE SOURCES: List 2-3 reputable sources (Reuters, AP, BBC, NPR preferred)
+7. DATE VERIFICATION: Confirm and mention when events occurred
+
+`;
+
+    // Add conversation context if this is a follow-up
+    if (conversationHistory.length > 0) {
+      prompt += `\nPrevious conversation context:\n`;
+      conversationHistory.slice(-5).forEach((exchange, idx) => {
+        prompt += `Q${idx + 1}: ${exchange.query}\nA${idx + 1}: ${exchange.summary}\n\n`;
+      });
+      prompt += `Now answering the follow-up question: "${userQuery}"\n\n`;
+    }
+
+    prompt += `Return your response as JSON in this exact format:
+{
+  "headline": "Neutral 8-15 word headline describing what happened",
+  "summary": "2-3 paragraph factual summary with dates and context. Remove politician names and use neutral language throughout.",
+  "sources": ["Source Name 1", "Source Name 2", "Source Name 3"],
+  "last_updated": "Description of when the latest information is from (e.g., 'January 9, 2026' or 'Last 24 hours')",
+  "related_topics": ["Related Topic 1", "Related Topic 2"]
+}
+
+Return ONLY the JSON, no other text.`;
+
+    // Call Claude API with web search
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      tools: [
+        {
+          type: 'web_search_20250305',
+          name: 'web_search'
+        }
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ]
+    });
+
+    console.log(`Query ${queryId}: Claude response received, ${message.content.length} content blocks`);
+
+    // Extract JSON from response
+    let resultText = '';
+    for (const block of message.content) {
+      if (block.type === 'text') {
+        resultText += block.text;
+      }
+    }
+
+    // Parse JSON from response (handle markdown code blocks)
+    let jsonText = resultText;
+    if (jsonText.includes('```json')) {
+      jsonText = jsonText.split('```json')[1].split('```')[0].trim();
+    } else if (jsonText.includes('```')) {
+      jsonText = jsonText.split('```')[1].split('```')[0].trim();
+    }
+
+    const result = JSON.parse(jsonText);
+
+    // Update conversation store
+    const conversation = conversations.get(queryId);
+    if (conversation) {
+      conversation.result = result;
+      conversation.status = 'complete';
+      conversation.conversationHistory.push({
+        query: userQuery,
+        ...result
+      });
+      conversations.set(queryId, conversation);
+    }
+
+    console.log(`Query ${queryId}: Complete - "${result.headline}"`);
+    return result;
+
+  } catch (error) {
+    console.error(`Error processing query ${queryId}:`, error);
+
+    // Update conversation with error status
+    const conversation = conversations.get(queryId);
+    if (conversation) {
+      conversation.status = 'error';
+      conversation.error = error.message;
+      conversations.set(queryId, conversation);
+    }
+
+    throw error;
+  }
+}
+
 // Main generation function
 async function generateNews(quickMode = false) {
   console.log(`Starting two-step news generation... (${quickMode ? 'QUICK MODE' : 'FULL MODE'})`);
@@ -318,6 +453,127 @@ app.get('/health', (req, res) => {
   res.json({ status: 'healthy', message: 'News generator is running' });
 });
 
+// =============================================================================
+// INTERACTIVE QUERY ENDPOINTS
+// =============================================================================
+
+// POST /api/query - Submit a new user query
+app.post('/api/query', async (req, res) => {
+  try {
+    const { query, conversationId } = req.body;
+    const userIp = req.ip || req.connection.remoteAddress;
+
+    // Validate input
+    if (!query || typeof query !== 'string' || query.trim().length === 0) {
+      return res.status(400).json({ error: 'Query is required' });
+    }
+
+    if (query.length > 500) {
+      return res.status(400).json({ error: 'Query too long (max 500 characters)' });
+    }
+
+    // Check rate limit
+    if (!checkRateLimit(userIp)) {
+      return res.status(429).json({
+        error: 'Rate limit exceeded',
+        message: 'Maximum 5 queries per 10 minutes. Please try again later.'
+      });
+    }
+
+    // Check conversation limit
+    if (conversations.size >= MAX_CONVERSATIONS) {
+      return res.status(503).json({
+        error: 'Service busy',
+        message: 'Too many active conversations. Please try again in a few minutes.'
+      });
+    }
+
+    // Generate unique query ID
+    const queryId = crypto.randomBytes(16).toString('hex');
+
+    // Get conversation history if this is a follow-up
+    let conversationHistory = [];
+    if (conversationId) {
+      const existingConversation = conversations.get(conversationId);
+      if (existingConversation && existingConversation.conversationHistory) {
+        conversationHistory = existingConversation.conversationHistory;
+        console.log(`Follow-up query for conversation ${conversationId}`);
+      }
+    }
+
+    // Store conversation in memory
+    conversations.set(queryId, {
+      query: query.trim(),
+      result: null,
+      conversationHistory: conversationHistory,
+      timestamp: Date.now(),
+      status: 'processing',
+      ip: userIp
+    });
+
+    // Send immediate response
+    res.json({
+      queryId: queryId,
+      status: 'processing',
+      message: 'Your query is being researched'
+    });
+
+    // Process query asynchronously
+    processUserQuery(queryId, query.trim(), conversationHistory).catch(err => {
+      console.error(`Async processing error for query ${queryId}:`, err);
+    });
+
+  } catch (error) {
+    console.error('Error in /api/query endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/query-status/:id - Poll for query results
+app.get('/api/query-status/:id', (req, res) => {
+  try {
+    const queryId = req.params.id;
+    const conversation = conversations.get(queryId);
+
+    if (!conversation) {
+      return res.status(404).json({
+        error: 'Query not found',
+        message: 'Query may have expired (queries are kept for 1 hour)'
+      });
+    }
+
+    // Return current status
+    if (conversation.status === 'processing') {
+      return res.json({
+        status: 'processing',
+        message: 'Still researching your query...'
+      });
+    }
+
+    if (conversation.status === 'error') {
+      return res.json({
+        status: 'error',
+        error: conversation.error || 'An error occurred while processing your query'
+      });
+    }
+
+    if (conversation.status === 'complete') {
+      return res.json({
+        status: 'complete',
+        result: conversation.result,
+        conversationId: queryId // Allow follow-up questions
+      });
+    }
+
+    // Unknown status
+    res.status(500).json({ error: 'Unknown query status' });
+
+  } catch (error) {
+    console.error('Error in /api/query-status endpoint:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Start Express server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
@@ -329,7 +585,45 @@ cron.schedule('0 14 * * *', () => {
   generateNews(false); // false = FULL MODE for scheduled runs
 });
 
+// Cleanup expired conversations every 10 minutes
+setInterval(() => {
+  const now = Date.now();
+  let cleaned = 0;
+
+  for (const [id, conversation] of conversations.entries()) {
+    if (now - conversation.timestamp > CONVERSATION_EXPIRY_MS) {
+      conversations.delete(id);
+      cleaned++;
+    }
+  }
+
+  if (cleaned > 0) {
+    console.log(`Cleaned up ${cleaned} expired conversation(s)`);
+  }
+}, 600000); // 10 minutes
+
+// Cleanup old rate limit entries every 10 minutes
+setInterval(() => {
+  const now = Date.now();
+  let cleaned = 0;
+
+  for (const [ip, timestamps] of queryLimits.entries()) {
+    const recentTimestamps = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+    if (recentTimestamps.length === 0) {
+      queryLimits.delete(ip);
+      cleaned++;
+    } else if (recentTimestamps.length < timestamps.length) {
+      queryLimits.set(ip, recentTimestamps);
+    }
+  }
+
+  if (cleaned > 0) {
+    console.log(`Cleaned up rate limit data for ${cleaned} IP(s)`);
+  }
+}, 600000); // 10 minutes
+
 // Keep the process alive
 console.log('News generator started. Will run daily at 6 AM PST (2 PM UTC).');
 console.log('Next run will be at 6 AM PST.');
 console.log('Manual generation available at /generate endpoint (QUICK MODE)');
+console.log('Interactive query API available at /api/query endpoint');

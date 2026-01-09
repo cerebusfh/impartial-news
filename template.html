@@ -191,6 +191,34 @@
 
     </main>
 
+    <!-- INTERACTIVE QUERY SECTION -->
+    <section class="container mx-auto max-w-5xl px-4 mt-12 mb-8">
+        <div class="bg-white p-6 rounded-lg border-3 border-gray-900" style="border-width: 3px;">
+            <h2 class="section-header mb-4">Search for a Specific Story</h2>
+            <p class="text-sm text-gray-600 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                Ask about any news topic to get an unbiased, factual summary
+            </p>
+
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="query-input"
+                       placeholder="e.g., tell me about the Venezuelan president kidnapping"
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded"
+                       style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 0.95rem;">
+                <button id="query-submit-btn"
+                        class="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded font-semibold"
+                        style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    Search
+                </button>
+            </div>
+
+            <div id="query-status" class="text-sm text-gray-600 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;"></div>
+
+            <div id="query-results" class="hidden">
+                <!-- Conversation history appears here -->
+            </div>
+        </div>
+    </section>
+
     <footer class="bg-gray-900 text-gray-400 py-6 mt-8 text-center" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
         <div class="container mx-auto max-w-5xl px-4">
             <p class="text-sm">&copy; 2026 Impartial News Aggregator</p>
@@ -199,6 +227,7 @@
     </footer>
 
     <script>
+    // Refresh news button handler
     document.getElementById('refresh-news-btn').addEventListener('click', async function() {
         const btn = this;
         const status = document.getElementById('refresh-status');
@@ -221,6 +250,169 @@
             btn.textContent = '🔄 Update Edition';
         }
     });
+
+    // Query system state
+    let currentConversationId = null;
+    let pollInterval = null;
+
+    // Submit query handler
+    document.getElementById('query-submit-btn').addEventListener('click', submitQuery);
+    document.getElementById('query-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            submitQuery();
+        }
+    });
+
+    async function submitQuery() {
+        const input = document.getElementById('query-input');
+        const query = input.value.trim();
+        const statusDiv = document.getElementById('query-status');
+        const resultsDiv = document.getElementById('query-results');
+        const submitBtn = document.getElementById('query-submit-btn');
+
+        if (!query) {
+            statusDiv.textContent = '⚠️ Please enter a question';
+            statusDiv.className = 'text-sm text-red-600 mb-4';
+            return;
+        }
+
+        // Disable input during processing
+        input.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Searching...';
+        statusDiv.textContent = '🔍 Researching your query...';
+        statusDiv.className = 'text-sm text-blue-600 mb-4';
+
+        try {
+            // Submit query
+            const response = await fetch('https://impartial-news-production.up.railway.app/api/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: query,
+                    conversationId: currentConversationId
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || data.error || 'Request failed');
+            }
+
+            // Start polling for results
+            startPolling(data.queryId);
+
+        } catch (error) {
+            statusDiv.textContent = '❌ Error: ' + error.message;
+            statusDiv.className = 'text-sm text-red-600 mb-4';
+            input.disabled = false;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Search';
+        }
+    }
+
+    function startPolling(queryId) {
+        let attempts = 0;
+        const maxAttempts = 30; // 30 attempts × 2 seconds = 60 seconds max
+
+        pollInterval = setInterval(async () => {
+            attempts++;
+
+            try {
+                const response = await fetch(`https://impartial-news-production.up.railway.app/api/query-status/${queryId}`);
+                const data = await response.json();
+
+                if (data.status === 'complete') {
+                    clearInterval(pollInterval);
+                    displayResult(data.result, data.conversationId);
+                } else if (data.status === 'error') {
+                    clearInterval(pollInterval);
+                    const statusDiv = document.getElementById('query-status');
+                    statusDiv.textContent = '❌ ' + (data.error || 'An error occurred');
+                    statusDiv.className = 'text-sm text-red-600 mb-4';
+                    resetInputs();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(pollInterval);
+                    const statusDiv = document.getElementById('query-status');
+                    statusDiv.textContent = '⏱️ Query timeout - please try again';
+                    statusDiv.className = 'text-sm text-red-600 mb-4';
+                    resetInputs();
+                }
+            } catch (error) {
+                clearInterval(pollInterval);
+                const statusDiv = document.getElementById('query-status');
+                statusDiv.textContent = '❌ Error checking status: ' + error.message;
+                statusDiv.className = 'text-sm text-red-600 mb-4';
+                resetInputs();
+            }
+        }, 2000); // Poll every 2 seconds
+    }
+
+    function displayResult(result, conversationId) {
+        const statusDiv = document.getElementById('query-status');
+        const resultsDiv = document.getElementById('query-results');
+        const input = document.getElementById('query-input');
+
+        // Update conversation ID for follow-ups
+        currentConversationId = conversationId;
+
+        // Clear status
+        statusDiv.textContent = '';
+
+        // Show results section
+        resultsDiv.classList.remove('hidden');
+
+        // Create result HTML
+        const resultHtml = `
+            <div class="news-story" style="padding-top: 1rem; border-top: 2px solid #e5e5e5; margin-top: 1rem;">
+                <h3 class="headline" style="font-size: 1.3rem; margin-bottom: 0.75rem;">${escapeHtml(result.headline)}</h3>
+                <div class="blurb" style="white-space: pre-wrap; margin-bottom: 0.75rem;">${escapeHtml(result.summary)}</div>
+                <div class="text-xs text-gray-600 mb-2" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Sources:</strong> ${result.sources.map(s => escapeHtml(s)).join(', ')}
+                </div>
+                <div class="text-xs text-gray-500" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Last Updated:</strong> ${escapeHtml(result.last_updated)}
+                </div>
+                ${result.related_topics && result.related_topics.length > 0 ? `
+                <div class="text-xs text-gray-500 mt-2" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Related:</strong> ${result.related_topics.map(t => escapeHtml(t)).join(', ')}
+                </div>
+                ` : ''}
+            </div>
+        `;
+
+        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+
+        // Reset inputs for follow-up question
+        input.value = '';
+        input.disabled = false;
+        input.placeholder = 'Ask a follow-up question...';
+
+        const submitBtn = document.getElementById('query-submit-btn');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Search';
+
+        // Focus input for follow-up
+        input.focus();
+    }
+
+    function resetInputs() {
+        const input = document.getElementById('query-input');
+        const submitBtn = document.getElementById('query-submit-btn');
+
+        input.disabled = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Search';
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
     </script>
 </body>
 </html>
