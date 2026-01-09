@@ -48,7 +48,7 @@ function getResearchPrompt(quickMode = false) {
   
   // Add quick mode instruction if enabled
   if (quickMode) {
-    prompt += '\n\n**QUICK MODE**: Limit to 2-3 searches per category instead of comprehensive coverage. Prioritize speed over thoroughness.';
+    prompt += '\n\n---\n\n**🚨 QUICK MODE ACTIVE 🚨**\n\nYou MUST perform ONLY 1 search per category (7 searches TOTAL) to avoid rate limits. Use ONLY the "Primary" search query listed for each category. Skip ALL additional searches. Work with the limited data you find.';
   }
   
   return prompt;

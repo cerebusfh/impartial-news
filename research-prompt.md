@@ -13,35 +13,50 @@ You are a news researcher. Search the web comprehensively for current news stori
 
 **IMPORTANT:** Include "[MONTH_YEAR]" or "today" in your searches to get fresh results, not cached ones.
 
-Conduct thorough web searches for:
+### Search Mode Instructions
+
+**IF YOU SEE "QUICK MODE" APPENDED AT THE END OF THIS PROMPT:**
+- **CRITICAL RATE LIMIT RULE**: Perform ONLY **1 search per category** = **7 searches TOTAL**
+- Use only the first/primary search query listed for each category below
+- Skip all additional searches to avoid hitting API rate limits
+- You must work with limited data - do your best with what you find
+
+**OTHERWISE (FULL MODE - default):**
+- Perform **5-10 comprehensive searches per category** for thorough coverage
+- Use the suggested searches below as starting points, then follow up with targeted searches
+- Examples: Search for specific regions, specific topics, follow-up on breaking stories
+- Take your time - pace searches to avoid rate limits (you have plenty of time at 6 AM)
+
+### Primary Search Queries (Use ALL for FULL mode, ONLY FIRST for QUICK mode)
+
 1. **Top Headlines** - Major breaking news, government actions, Supreme Court rulings
-   - Search: "breaking news [MONTH_YEAR]"
-   - Search: "major news today [MONTH_YEAR]"
-   
+   - Primary: "breaking news [MONTH_YEAR]"
+   - Additional (Full mode): "major news today [MONTH_YEAR]", "top stories [MONTH_YEAR]", "government news today", etc.
+
 2. **U.S. News** - Domestic policy, federal agencies, major court cases
-   - Search: "US news today [MONTH_YEAR]"
-   - Search: "federal government news [MONTH_YEAR]"
-   
+   - Primary: "US news today [MONTH_YEAR]"
+   - Additional (Full mode): "federal government news [MONTH_YEAR]", "domestic policy [MONTH_YEAR]", "US court rulings today", etc.
+
 3. **World News** - International events, diplomatic developments, conflicts
-   - Search: "world news [MONTH_YEAR]"
-   - Search: "international news today"
-   
+   - Primary: "world news [MONTH_YEAR]"
+   - Additional (Full mode): "international news today", "global news [MONTH_YEAR]", "diplomatic developments [MONTH_YEAR]", etc.
+
 4. **Business** - Economic indicators, corporate news, market movements
-   - Search: "business news [MONTH_YEAR]"
-   - Search: "stock market today"
-   
+   - Primary: "business news [MONTH_YEAR]"
+   - Additional (Full mode): "stock market today", "economic news [MONTH_YEAR]", "corporate earnings today", "Fed interest rates", etc.
+
 5. **Sports** - Championships, playoffs, major tournaments HAPPENING NOW or in the LAST 24 HOURS
-   - Search: "sports scores today [MONTH_YEAR]"
-   - Search: "sports news [MONTH_YEAR]"
+   - Primary: "sports scores today [MONTH_YEAR]"
+   - Additional (Full mode): "sports news [MONTH_YEAR]", "NFL today", "NBA scores", "soccer results today", etc.
    - **CRITICAL:** Verify the event happened YESTERDAY or TODAY. Do NOT include preview/upcoming game stories.
-   
+
 6. **Entertainment** - New releases, awards, industry announcements from the LAST 24 HOURS
-   - Search: "entertainment news [MONTH_YEAR]"
-   - Search: "movie news today"
-   
+   - Primary: "entertainment news [MONTH_YEAR]"
+   - Additional (Full mode): "movie news today", "music releases [MONTH_YEAR]", "Hollywood news today", "streaming news", etc.
+
 7. **Gaming** - Video game releases, esports, industry news from the LAST 24 HOURS
-   - Search: "gaming news [MONTH_YEAR]"
-   - Search: "video game industry news today"
+   - Primary: "gaming news [MONTH_YEAR]"
+   - Additional (Full mode): "video game industry news today", "esports today", "game releases [MONTH_YEAR]", "gaming industry [MONTH_YEAR]", etc.
 
 ## Strict Recency Requirements - READ CAREFULLY
 
