@@ -34,8 +34,8 @@ const MAX_CONVERSATIONS = 1000; // Hard cap to prevent memory leak
 
 // Rate limiting for user queries
 const queryLimits = new Map(); // ip → [timestamps]
-const MAX_QUERIES_PER_WINDOW = 5;
-const RATE_LIMIT_WINDOW_MS = 600000; // 10 minutes
+const MAX_QUERIES_PER_WINDOW = 2;
+const RATE_LIMIT_WINDOW_MS = 86400000; // 24 hours (1 day)
 
 // Read prompts from files
 function getResearchPrompt(quickMode = false) {
@@ -183,6 +183,123 @@ async function researchNews(quickMode = false) {
   }
 }
 
+// STEP 1.5: Generate expanded versions of stories (FULL mode only)
+async function generateExpansions(newsData) {
+  console.log('STEP 1.5: Generating expanded story versions...');
+
+  try {
+    let totalExpanded = 0;
+    const categories = Object.keys(newsData.categories);
+
+    for (const categoryKey of categories) {
+      const stories = newsData.categories[categoryKey];
+      console.log(`Expanding ${stories.length} stories in ${categoryKey}...`);
+
+      for (let i = 0; i < stories.length; i++) {
+        const story = stories[i];
+
+        try {
+          console.log(`  Expanding story ${i + 1}/${stories.length}: "${story.headline.substring(0, 50)}..."`);
+
+          const expansionPrompt = `You are a news researcher. Expand on this story with more details.
+
+**Original Story:**
+Headline: ${story.headline}
+Blurb: ${story.blurb}
+Source: ${story.source}
+
+**Your Task:**
+Research this story and provide:
+1. An expanded summary (3-4 paragraphs, 200-300 words)
+2. Additional sources that covered this story
+3. Related topics or context
+
+**Critical Requirements:**
+- Maintain neutral, factual tone
+- No politician names (use titles)
+- Focus on verified facts
+- Cite specific sources
+
+Return ONLY valid JSON in this format:
+{
+  "expanded_summary": "3-4 paragraph expanded summary here...",
+  "additional_sources": ["Source 1", "Source 2", "Source 3"],
+  "related_topics": ["Topic 1", "Topic 2", "Topic 3"]
+}`;
+
+          const message = await anthropic.messages.create({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 2000,
+            tools: [
+              {
+                type: 'web_search_20250305',
+                name: 'web_search'
+              }
+            ],
+            messages: [
+              {
+                role: 'user',
+                content: expansionPrompt
+              }
+            ]
+          });
+
+          // Extract JSON from response
+          let expansionText = '';
+          for (const block of message.content) {
+            if (block.type === 'text') {
+              expansionText = block.text;
+              break;
+            }
+          }
+
+          // Clean up JSON extraction
+          if (expansionText.includes('```json')) {
+            expansionText = expansionText.split('```json')[1].split('```')[0].trim();
+          } else if (expansionText.includes('```')) {
+            expansionText = expansionText.split('```')[1].split('```')[0].trim();
+          }
+
+          // Try to extract JSON if wrapped in narrative
+          if (!expansionText.trim().startsWith('{')) {
+            const jsonMatch = expansionText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              expansionText = jsonMatch[0];
+            }
+          }
+
+          const expansion = JSON.parse(expansionText);
+
+          // Add expansion data to story
+          story.expanded_summary = expansion.expanded_summary || story.blurb;
+          story.additional_sources = expansion.additional_sources || [];
+          story.related_topics = expansion.related_topics || [];
+
+          totalExpanded++;
+
+          // Wait 2 seconds before next expansion to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 2000));
+
+        } catch (error) {
+          console.error(`  Error expanding story: ${error.message}`);
+          // If expansion fails, use original blurb as fallback
+          story.expanded_summary = story.blurb;
+          story.additional_sources = [story.source];
+          story.related_topics = [];
+        }
+      }
+    }
+
+    console.log(`Expansions complete: ${totalExpanded} stories expanded`);
+    return newsData;
+
+  } catch (error) {
+    console.error('Error in expansion phase:', error);
+    // Don't throw - return original data as fallback
+    return newsData;
+  }
+}
+
 // STEP 2: Generate HTML from research data (using template - NO API CALL!)
 function generateHtml(newsData) {
   console.log('STEP 2: Generating HTML from template (no API call)...');
@@ -191,10 +308,18 @@ function generateHtml(newsData) {
     // Read the HTML template
     const template = fs.readFileSync('./template.html', 'utf8');
 
-    // Helper function to create story HTML
+    // Helper function to create story HTML with expansion data
     const createStoryHtml = (story, isTopHeadline = false) => {
       const headlineClass = isTopHeadline ? 'headline top-headline' : 'headline';
-      return `                <article class="news-story">
+
+      // Store expansion data as JSON in data attribute for client-side access
+      const expansionData = story.expanded_summary ? JSON.stringify({
+        expanded_summary: story.expanded_summary,
+        additional_sources: story.additional_sources || [],
+        related_topics: story.related_topics || []
+      }).replace(/"/g, '&quot;') : '';
+
+      return `                <article class="news-story" ${expansionData ? `data-expansion='${expansionData}'` : ''}>
                     <h3 class="${headlineClass}">${story.headline}</h3>
                     <p class="blurb">${story.blurb}</p>
                     <p class="source">${story.source}</p>
@@ -430,12 +555,20 @@ IMPORTANT: Start your response with { and end with }. Nothing else.`;
 
 // Main generation function
 async function generateNews(quickMode = false) {
-  console.log(`Starting two-step news generation... (${quickMode ? 'QUICK MODE' : 'FULL MODE'})`);
-  
+  console.log(`Starting news generation... (${quickMode ? 'QUICK MODE' : 'FULL MODE'})`);
+
   try {
     // Step 1: Research
-    const newsData = await researchNews(quickMode);
-    
+    let newsData = await researchNews(quickMode);
+
+    // Step 1.5: Generate expansions (FULL mode only)
+    if (!quickMode) {
+      console.log('FULL MODE: Generating story expansions...');
+      newsData = await generateExpansions(newsData);
+    } else {
+      console.log('QUICK MODE: Skipping story expansions to save time/cost');
+    }
+
     // Save research data for debugging
     fs.writeFileSync('./news-data.json', JSON.stringify(newsData, null, 2));
     console.log('Research data saved to news-data.json');

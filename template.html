@@ -237,6 +237,11 @@
             <p class="text-sm text-gray-600 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
                 Ask about any news topic to get an unbiased, factual summary
             </p>
+            <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                <p class="text-xs text-blue-800">
+                    ⚠️ <strong>Search Limit:</strong> 2 queries per day per user. Each search uses AI and incurs costs.
+                </p>
+            </div>
 
             <div class="flex gap-2 mb-4">
                 <input type="text" id="query-input"
@@ -324,6 +329,11 @@
                 <p class="text-sm text-gray-600 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
                     Ask about any news topic to get an unbiased, factual summary
                 </p>
+                <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <p class="text-xs text-blue-800">
+                        ⚠️ <strong>Search Limit:</strong> 2 queries per day per user. Each search uses AI and incurs costs.
+                    </p>
+                </div>
 
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="search-modal-input"
@@ -640,15 +650,17 @@
         document.querySelectorAll('.news-story').forEach(card => {
             card.addEventListener('click', function() {
                 const headline = this.querySelector('.headline')?.textContent?.trim();
+                const expansionData = this.getAttribute('data-expansion');
+
                 if (headline) {
-                    openStoryModal(headline);
+                    openStoryModal(headline, expansionData);
                 }
             });
         });
     }
 
     // Open modal and fetch story details
-    async function openStoryModal(headline) {
+    async function openStoryModal(headline, expansionData = null) {
         const modal = document.getElementById('story-modal');
         const modalHeadline = document.getElementById('modal-headline');
         const loadingDiv = document.getElementById('modal-loading');
@@ -660,42 +672,76 @@
             modalHeadline.textContent = headline;
         }
 
-        // Show modal with loading state
+        // Show modal
         modal.classList.remove('hidden');
-        loadingDiv.classList.remove('hidden');
-        resultDiv.classList.add('hidden');
         resultDiv.innerHTML = '';
         followupDiv.classList.add('hidden');
         modalConversationId = null;
 
-        // Start rotating progress messages
-        startProgressMessages('modal-loading');
-
         // Prevent body scroll
         document.body.style.overflow = 'hidden';
 
-        // Query for more details
-        const query = `Tell me more about: ${headline}`;
+        // Check if we have pre-generated expansion data
+        if (expansionData) {
+            try {
+                const expansion = JSON.parse(expansionData);
 
-        try {
-            const response = await fetch('https://impartial-news-production.up.railway.app/api/query', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query })
-            });
+                // Hide loading and show pre-generated content immediately
+                loadingDiv.classList.add('hidden');
 
-            const data = await response.json();
+                // Build result HTML from pre-generated data
+                const resultHtml = `
+                    <div class="mb-6">
+                        <div class="text-xs text-gray-500 mb-3 italic" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                            ℹ️ This expanded story was pre-generated at 6 AM for instant access
+                        </div>
+                        <h2 class="headline top-headline mb-4">${escapeHtml(headline)}</h2>
+                        <div class="blurb mb-6" style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.7;">
+                            ${escapeHtml(expansion.expanded_summary)}
+                        </div>
+                        ${expansion.additional_sources && expansion.additional_sources.length > 0 ? `
+                        <div class="text-sm text-gray-600 mb-3" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                            <strong>Sources:</strong> ${expansion.additional_sources.map(s => escapeHtml(s)).join(', ')}
+                        </div>
+                        ` : ''}
+                        ${expansion.related_topics && expansion.related_topics.length > 0 ? `
+                        <div class="text-sm text-gray-500 mt-3" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                            <strong>Related:</strong> ${expansion.related_topics.map(t => escapeHtml(t)).join(', ')}
+                        </div>
+                        ` : ''}
+                        <div class="text-xs text-gray-500 mt-4 pt-4 border-t" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                            💡 Use the field below to ask follow-up questions (uses your daily query limit: 2 per day)
+                        </div>
+                    </div>
+                `;
 
-            if (!response.ok) {
-                throw new Error(data.message || data.error || 'Request failed');
+                resultDiv.innerHTML = resultHtml;
+                resultDiv.classList.remove('hidden');
+                followupDiv.classList.remove('hidden');
+
+                return;
+
+            } catch (error) {
+                console.error('Error parsing expansion data:', error);
+                // Fall through to API fetch if parsing fails
             }
-
-            // Start polling
-            startModalPolling(data.queryId);
-
-        } catch (error) {
-            loadingDiv.innerHTML = `<p class="text-red-600">❌ Error: ${error.message}</p>`;
         }
+
+        // No pre-generated data - show message about QUICK mode
+        loadingDiv.classList.remove('hidden');
+        loadingDiv.innerHTML = `
+            <div class="text-center py-8">
+                <p class="text-lg text-gray-600 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    ℹ️ Expanded stories are only available after the daily 6 AM generation
+                </p>
+                <p class="text-sm text-gray-500 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    This was a quick manual update without story expansions.
+                </p>
+                <p class="text-sm text-gray-600" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    💡 You can still search for this story using the "Search News" button above (2 queries per day)
+                </p>
+            </div>
+        `;
     }
 
     // Poll for modal results
