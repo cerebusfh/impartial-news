@@ -152,18 +152,22 @@
         </div>
     </header>
 
-    <div class="container mx-auto max-w-5xl px-4 mt-4 mb-4 flex items-center gap-3">
-        <button id="refresh-news-btn"
-                class="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-6 rounded text-sm transition duration-150 ease-in-out"
-                style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-            🔄 Update Edition
-        </button>
-        <button id="search-modal-btn"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded text-sm transition duration-150 ease-in-out"
-                style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-            🔍 Search News
-        </button>
-        <span id="refresh-status" class="ml-4 text-sm text-gray-600"></span>
+    <div class="container mx-auto max-w-5xl px-4 mt-4 mb-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button id="refresh-news-btn"
+                        class="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-6 rounded text-sm transition duration-150 ease-in-out"
+                        style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    🔄 Update Edition
+                </button>
+                <span id="refresh-status" class="text-sm text-gray-600"></span>
+            </div>
+            <button id="search-modal-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded text-sm transition duration-150 ease-in-out"
+                    style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                🔍 Search News
+            </button>
+        </div>
     </div>
 
     <main class="container mx-auto max-w-5xl px-4 bg-white" style="padding-top: 1.5rem; padding-bottom: 3rem;">
@@ -737,27 +741,39 @@
         // Stop progress messages
         stopProgressMessages();
 
-        // Hide loading
+        // Hide loading (initial modal loading)
         loadingDiv.classList.add('hidden');
 
-        // Build result HTML
-        resultDiv.innerHTML = `
-            <h2 class="headline top-headline mb-4">${escapeHtml(result.headline)}</h2>
-            <div class="blurb mb-6" style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.7;">
-                ${escapeHtml(result.summary)}
+        // Remove follow-up loading indicator if present
+        const followupLoadingDiv = document.getElementById('modal-result-loading');
+        if (followupLoadingDiv) {
+            followupLoadingDiv.remove();
+        }
+
+        // Build result HTML with separator for follow-ups
+        const isFollowup = resultDiv.innerHTML.trim().length > 0;
+        const resultHtml = `
+            <div class="mb-6 ${isFollowup ? 'pb-6 border-b border-gray-200' : ''}">
+                <h2 class="headline top-headline mb-4">${escapeHtml(result.headline)}</h2>
+                <div class="blurb mb-6" style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.7;">
+                    ${escapeHtml(result.summary)}
+                </div>
+                <div class="text-sm text-gray-600 mb-3" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Sources:</strong> ${result.sources.map(s => escapeHtml(s)).join(', ')}
+                </div>
+                <div class="text-sm text-gray-500" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Last Updated:</strong> ${escapeHtml(result.last_updated)}
+                </div>
+                ${result.related_topics && result.related_topics.length > 0 ? `
+                <div class="text-sm text-gray-500 mt-3" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Related:</strong> ${result.related_topics.map(t => escapeHtml(t)).join(', ')}
+                </div>
+                ` : ''}
             </div>
-            <div class="text-sm text-gray-600 mb-3" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                <strong>Sources:</strong> ${result.sources.map(s => escapeHtml(s)).join(', ')}
-            </div>
-            <div class="text-sm text-gray-500" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                <strong>Last Updated:</strong> ${escapeHtml(result.last_updated)}
-            </div>
-            ${result.related_topics && result.related_topics.length > 0 ? `
-            <div class="text-sm text-gray-500 mt-3" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                <strong>Related:</strong> ${result.related_topics.map(t => escapeHtml(t)).join(', ')}
-            </div>
-            ` : ''}
         `;
+
+        // Prepend new result (newest on top), preserving conversation history
+        resultDiv.innerHTML = resultHtml + resultDiv.innerHTML;
 
         // Show result and follow-up input
         resultDiv.classList.remove('hidden');
@@ -796,12 +812,14 @@
 
         if (!query || !modalConversationId) return;
 
-        // Show loading in result area
+        // Show loading at top, preserving previous results below
         const resultDiv = document.getElementById('modal-result');
         const followupDiv = document.getElementById('modal-followup');
 
         followupDiv.classList.add('hidden');
-        resultDiv.innerHTML = '<div id="modal-result-loading"></div>';
+
+        // Prepend loading indicator at top (don't clear previous results)
+        resultDiv.innerHTML = '<div id="modal-result-loading" class="mb-6 pb-6 border-b border-gray-200"></div>' + resultDiv.innerHTML;
 
         // Start rotating progress messages for follow-up
         startProgressMessages('modal-result-loading');
