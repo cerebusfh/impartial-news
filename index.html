@@ -148,15 +148,20 @@
         <div class="container mx-auto max-w-5xl px-4">
             <h1 class="masthead">IMPARTIAL NEWS</h1>
             <p class="tagline">"All the News That's Fit to Read"</p>
-            <p class="date-header">January 9, 2026 | Last Updated: Jan 9, 2026, 3:42 PM</p>
+            <p class="date-header">January 9, 2026 | Last Updated: Jan 9, 2026, 3:59 PM</p>
         </div>
     </header>
 
-    <div class="container mx-auto max-w-5xl px-4 mt-4 mb-4">
+    <div class="container mx-auto max-w-5xl px-4 mt-4 mb-4 flex items-center gap-3">
         <button id="refresh-news-btn"
                 class="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-6 rounded text-sm transition duration-150 ease-in-out"
                 style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
             🔄 Update Edition
+        </button>
+        <button id="search-modal-btn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded text-sm transition duration-150 ease-in-out"
+                style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+            🔍 Search News
         </button>
         <span id="refresh-status" class="ml-4 text-sm text-gray-600"></span>
     </div>
@@ -168,24 +173,24 @@
             <h2 class="section-header">Top Headlines</h2>
             <div class="grid md:grid-cols-2 gap-x-8">
                                 <article class="news-story">
-                    <h3 class="headline top-headline">Federal Reserve Maintains Current Interest Rate Policy</h3>
-                    <p class="blurb">Central bank officials kept rates steady following their latest policy meeting, citing stable economic indicators and continued growth momentum in their assessment.</p>
-                    <p class="source">Reuters</p>
+                    <h3 class="headline top-headline">Coast Guard Seizes Fifth Venezuelan Oil Tanker in Caribbean</h3>
+                    <p class="blurb">US forces boarded the Motor Tanker Olina in international waters on January 9, continuing operations against Venezuela's 'ghost fleet' following recent military action against the country.</p>
+                    <p class="source">ABC News</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline top-headline">Stock Markets Reach New Record Highs</h3>
-                    <p class="blurb">The S&P 500 and Dow Jones Industrial Average closed at fresh all-time highs on Friday, with the S&P 500 gaining 0.65% to reach 6,966.28 points.</p>
-                    <p class="source">Bloomberg</p>
+                    <h3 class="headline top-headline">Stock Markets Reach Record Highs Following Jobs Report</h3>
+                    <p class="blurb">The S&P 500 closed at 6,966.28 and the Dow at 49,504.07, both setting fresh records on January 8 despite weaker-than-expected employment data showing 50,000 jobs added in December.</p>
+                    <p class="source">CNBC</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline top-headline">NASA Plans Early Return for Space Station Crew</h3>
-                    <p class="blurb">The space agency announced plans to bring four Crew-11 mission members back to Earth early after one astronaut developed an undisclosed medical condition.</p>
+                    <h3 class="headline top-headline">NASA Cancels Spacewalk Due to Crew Medical Issue</h3>
+                    <p class="blurb">The space agency announced on January 8 it will end the Crew-11 mission early after a crew member on the International Space Station developed an unspecified medical condition.</p>
                     <p class="source">NPR</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline top-headline">International Economic Growth Forecast Released</h3>
-                    <p class="blurb">UN economists project global economic output to grow 2.7% in 2026, slightly below 2025 estimates, according to the World Economic Situation and Prospects report.</p>
-                    <p class="source">UN News</p>
+                    <h3 class="headline top-headline">Federal Reserve to Resume Penny Distribution Services</h3>
+                    <p class="blurb">Starting January 14, the Fed will again accept pennies from banks at commercial coin distribution locations, addressing inventory constraints after US penny production ended.</p>
+                    <p class="source">Federal Reserve</p>
                 </article>
             </div>
         </section>
@@ -193,21 +198,26 @@
         <!-- U.S. NEWS -->
         <section class="mb-8">
             <h2 class="section-header">United States</h2>
-            <div>
+            <div class="grid md:grid-cols-2 gap-x-8">
                                 <article class="news-story">
-                    <h3 class="headline">Major Immigration Enforcement Operation Launched</h3>
-                    <p class="blurb">Homeland Security initiated what officials describe as the largest immigration enforcement operation ever conducted, targeting alleged fraud cases involving Somali residents in Minnesota.</p>
+                    <h3 class="headline">Minneapolis Continues Protests Following ICE Shooting</h3>
+                    <p class="blurb">Demonstrations persist after an Immigration and Customs Enforcement agent fatally shot Renee Good on January 7, with federal and local officials clashing over the incident's details.</p>
                     <p class="source">NPR</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">House Passes Major Appropriations Legislation</h3>
-                    <p class="blurb">Representatives approved the Commerce, Justice, Science; Energy and Water Development; and Interior appropriations bill for fiscal year 2026 with a 397-28 vote on Wednesday.</p>
+                    <h3 class="headline">House Passes Fiscal Year 2026 Appropriations Package</h3>
+                    <p class="blurb">Representatives approved the Commerce, Justice, Science and related agencies funding bill with a 397-28 vote on January 8, advancing critical federal budget legislation.</p>
                     <p class="source">House Appropriations Committee</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">Supreme Court Considers Tariff Policy Decision</h3>
-                    <p class="blurb">The high court failed to issue a ruling on the administration's import levy policies during Friday's session, with a decision expected in the coming months.</p>
-                    <p class="source">Yahoo Finance</p>
+                    <h3 class="headline">Supreme Court Considers Ruling on Administration Tariffs</h3>
+                    <p class="blurb">Bond traders await a potential decision on the current tariff regime, with the court's first 2026 opportunity passing without ruling on January 8.</p>
+                    <p class="source">Bloomberg</p>
+                </article>
+                <article class="news-story">
+                    <h3 class="headline">Two Killed in Salt Lake City Church Shooting</h3>
+                    <p class="blurb">A gunman opened fire in a Mormon church parking lot during a memorial service on January 7, killing two people and injuring six others before fleeing the scene.</p>
+                    <p class="source">NPR</p>
                 </article>
             </div>
         </section>
@@ -215,21 +225,26 @@
         <!-- WORLD NEWS -->
         <section class="mb-8">
             <h2 class="section-header">World</h2>
-            <div>
+            <div class="grid md:grid-cols-2 gap-x-8">
                                 <article class="news-story">
-                    <h3 class="headline">Iranian Authorities Address Growing Protests</h3>
-                    <p class="blurb">Officials reported ongoing demonstrations across multiple Iranian cities, with internet outages reported in Tehran amid economic grievances from citizens.</p>
-                    <p class="source">Reuters</p>
+                    <h3 class="headline">Iranian Government Faces Continued Anti-Government Unrest</h3>
+                    <p class="blurb">Protests continue against the regime on January 8, with authorities struggling to contain growing demonstrations as the supreme leader vowed not to back down against protesters.</p>
+                    <p class="source">Washington Post</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">UN Releases Global Economic Assessment</h3>
-                    <p class="blurb">The World Economic Situation and Prospects 2026 report projects moderate global growth, with economic challenges noted across multiple regions.</p>
+                    <h3 class="headline">UN Economic Report Predicts Subdued Global Growth</h3>
+                    <p class="blurb">The World Economic Situation and Prospects 2026 report released January 8 forecasts 2.7% global growth this year, below pre-pandemic averages due to trade concerns.</p>
                     <p class="source">UN News</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">European Nations Coordinate Diplomatic Response</h3>
-                    <p class="blurb">NATO Secretary General joined leaders in Paris for Coalition of the Willing discussions focused on regional security arrangements and international cooperation efforts.</p>
-                    <p class="source">NATO</p>
+                    <h3 class="headline">Switzerland Freezes Venezuelan Assets Following US Action</h3>
+                    <p class="blurb">Swiss authorities froze all assets held by former Venezuelan officials for four years on January 8, responding to the recent capture and transfer of government leaders.</p>
+                    <p class="source">Reuters</p>
+                </article>
+                <article class="news-story">
+                    <h3 class="headline">Bulgaria Officially Adopts Euro Currency</h3>
+                    <p class="blurb">The country became the 21st eurozone member on January 1, 2026, replacing the Bulgarian lev with the European common currency after meeting convergence criteria.</p>
+                    <p class="source">AFP</p>
                 </article>
             </div>
         </section>
@@ -237,20 +252,25 @@
         <!-- BUSINESS -->
         <section class="mb-8">
             <h2 class="section-header">Business</h2>
-            <div>
+            <div class="grid md:grid-cols-2 gap-x-8">
                                 <article class="news-story">
-                    <h3 class="headline">Technology Stocks Lead Market Rally</h3>
-                    <p class="blurb">Major tech companies drove broader market gains, with semiconductor and AI-related stocks showing particular strength in Friday's trading session.</p>
+                    <h3 class="headline">Major Stock Indices Hit All-Time Records Friday</h3>
+                    <p class="blurb">The S&P 500 gained 0.65% to close at 6,966.28 while the Dow added 238 points to reach 49,504.07, with both indexes marking fresh closing highs on January 8.</p>
                     <p class="source">CNBC</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">Mortgage Rates Drop to Three-Month Low</h3>
-                    <p class="blurb">The average 30-year mortgage rate fell to 5.87% as of Thursday, down from recent levels above 6%, potentially benefiting homebuyers and refinancing activity.</p>
-                    <p class="source">CBS News</p>
+                    <h3 class="headline">December Jobs Report Shows Economic Slowdown Signs</h3>
+                    <p class="blurb">US employers added only 50,000 jobs in December, significantly below the 73,000 economists expected, suggesting potential labor market cooling ahead of Federal Reserve decisions.</p>
+                    <p class="source">CNBC</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">Retail Leadership Changes Continue</h3>
-                    <p class="blurb">Luxury retailer Saks Global replaced its CEO as the company evaluates options to address ongoing debt challenges, with executive chairman assuming immediate control.</p>
+                    <h3 class="headline">Homebuilder Stocks Surge on Mortgage Rate Initiative</h3>
+                    <p class="blurb">Shares of D.R. Horton, PulteGroup, and Lennar jumped 7-8% on January 8 after the administration directed representatives to buy mortgage bonds to lower home rates.</p>
+                    <p class="source">CNBC</p>
+                </article>
+                <article class="news-story">
+                    <h3 class="headline">Saks Global CEO Replaced Amid Debt Crisis Concerns</h3>
+                    <p class="blurb">Marc Metrick was immediately replaced by executive chairman Richard Baker on January 2 as the luxury retailer evaluates options including potential bankruptcy filing.</p>
                     <p class="source">Yahoo Finance</p>
                 </article>
             </div>
@@ -259,21 +279,26 @@
         <!-- SPORTS -->
         <section class="mb-8">
             <h2 class="section-header">Sports</h2>
-            <div>
+            <div class="grid md:grid-cols-2 gap-x-8">
                                 <article class="news-story">
-                    <h3 class="headline">College Football Championship Game Decided</h3>
-                    <p class="blurb">Montana State defeated Illinois State 35-34 in overtime to win the 2025 FCS championship, earning the Bobcats their second national title since 1984.</p>
+                    <h3 class="headline">Montana State Claims FCS Championship in Overtime Thriller</h3>
+                    <p class="blurb">The Bobcats defeated Illinois State 35-34 in overtime on January 8 to capture their second national title and first since 1984 in Nashville, Tennessee.</p>
                     <p class="source">NCAA</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">NHL Players Reach Career Milestones</h3>
-                    <p class="blurb">Patrick Kane scored twice Wednesday night to reach 500 career goals, becoming the 50th player in NHL history to achieve the milestone in Detroit's victory over Vancouver.</p>
+                    <h3 class="headline">Patrick Kane Reaches 500-Goal Milestone in NHL</h3>
+                    <p class="blurb">The Detroit Red Wings forward scored twice on January 8 to become the 50th player in NHL history to reach 500 career goals in a 5-1 victory over Vancouver.</p>
                     <p class="source">ESPN</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">Professional Hockey Action Continues</h3>
-                    <p class="blurb">Connor McDavid extended his points streak to 17 games as Edmonton handed Winnipeg their 11th consecutive loss in Thursday's matchup.</p>
+                    <h3 class="headline">McDavid Extends Point Streak to 17 Games</h3>
+                    <p class="blurb">Connor McDavid continued his impressive run as the Edmonton Oilers defeated the Winnipeg Jets on January 8, handing the Jets their 11th consecutive loss.</p>
                     <p class="source">ESPN</p>
+                </article>
+                <article class="news-story">
+                    <h3 class="headline">College Football Playoff Semifinals Set for January 9</h3>
+                    <p class="blurb">The second semifinal game is scheduled for Friday, January 9, following completion of the first semifinal as the championship tournament continues in the new 12-team format.</p>
+                    <p class="source">NCAA</p>
                 </article>
             </div>
         </section>
@@ -281,21 +306,26 @@
         <!-- ENTERTAINMENT -->
         <section class="mb-8">
             <h2 class="section-header">Arts & Entertainment</h2>
-            <div>
+            <div class="grid md:grid-cols-2 gap-x-8">
                                 <article class="news-story">
-                    <h3 class="headline">Netflix Announces January Programming Slate</h3>
-                    <p class="blurb">The streaming service revealed new series and movies for January, including thriller 'His & Hers' starring Tessa Thompson and the final season of 'The Upshaws'.</p>
-                    <p class="source">HuffPost</p>
-                </article>
-                <article class="news-story">
-                    <h3 class="headline">Critics Choice Awards Ceremony Held</h3>
-                    <p class="blurb">The annual awards show recognized excellence in film and television, with nominees including Leonardo DiCaprio, Ariana Grande, and series like 'Severance' and 'The Pitt'.</p>
+                    <h3 class="headline">Critics Choice Awards Celebrate 2026 Film and TV Excellence</h3>
+                    <p class="blurb">The ceremony took place January 4 at the Barker Hangar with Jessica Biel, Elle Fanning, and Ariana Grande among the notable attendees recognizing outstanding creative achievements.</p>
                     <p class="source">E! Online</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">Streaming Services Expand Content Libraries</h3>
-                    <p class="blurb">Major platforms added new movies and series for January viewing, including Disney+ premieres and HBO Max acquisitions from recent theatrical releases.</p>
-                    <p class="source">Military.com</p>
+                    <h3 class="headline">Netflix Launches New Thriller Series His & Hers</h3>
+                    <p class="blurb">The limited series starring Tessa Thompson and Jon Bernthal premiered January 8, following two locals linked to a shocking murder in a quiet Georgia town.</p>
+                    <p class="source">Netflix</p>
+                </article>
+                <article class="news-story">
+                    <h3 class="headline">Marvel's Wonder Man Series Debuts on Disney Plus</h3>
+                    <p class="blurb">All eight episodes of the MCU series starring Yahya Abdul-Mateen II are set to release January 26, taking a meta approach to the comic book character's story.</p>
+                    <p class="source">Disney Plus</p>
+                </article>
+                <article class="news-story">
+                    <h3 class="headline">Netflix Acquires Warner Bros Discovery in Major Deal</h3>
+                    <p class="blurb">The streaming giant completed an $83 billion acquisition to own significant content rather than license it, marking the largest media consolidation move of early 2026.</p>
+                    <p class="source">Puck News</p>
                 </article>
             </div>
         </section>
@@ -303,20 +333,25 @@
         <!-- GAMING -->
         <section class="mb-8">
             <h2 class="section-header">Technology & Gaming</h2>
-            <div>
+            <div class="grid md:grid-cols-2 gap-x-8">
                                 <article class="news-story">
-                    <h3 class="headline">Xbox Developer Direct Showcase Announced</h3>
-                    <p class="blurb">Microsoft confirmed its January 22nd presentation will feature upcoming games including Fable, Forza Horizon 6, and other anticipated titles from Xbox Game Studios.</p>
-                    <p class="source">ComicBook</p>
+                    <h3 class="headline">Xbox Announces January 22 Developer Direct Showcase</h3>
+                    <p class="blurb">Microsoft confirmed the gaming event will feature first looks at Fable and Forza Horizon 6 gameplay, along with firm release dates for upcoming 2026 titles.</p>
+                    <p class="source">Comic Book</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">Gaming Industry Anticipates Strong Year</h3>
-                    <p class="blurb">Industry analysts suggest 2026 could be exceptional for video games, with major releases scheduled throughout the year including highly anticipated sequels and new franchises.</p>
-                    <p class="source">XboxEra</p>
+                    <h3 class="headline">GeForce NOW Adds 14 New Games in January</h3>
+                    <p class="blurb">NVIDIA's cloud gaming service launched its 2026 lineup on January 2 with RTX 5080-powered performance and DLSS 4 technology for Ultimate tier members.</p>
+                    <p class="source">NVIDIA</p>
                 </article>
                 <article class="news-story">
-                    <h3 class="headline">Game Pass Adds New Titles</h3>
-                    <p class="blurb">Microsoft's subscription service announced January additions including Resident Evil Village and Star Wars Outlaws as part of the first wave of 2026 content.</p>
+                    <h3 class="headline">Animal Crossing New Horizons Gets Switch 2 Enhancement</h3>
+                    <p class="blurb">Nintendo announced the upgraded edition featuring enhanced resolution, faster loading, and new gameplay features for the next-generation console, with a $5 upgrade fee.</p>
+                    <p class="source">GameSpot</p>
+                </article>
+                <article class="news-story">
+                    <h3 class="headline">Call of Duty Season 1 Reloaded Launches for Black Ops 7</h3>
+                    <p class="blurb">Activision released major content updates for both Black Ops 7 and Warzone on January 7, introducing new maps, weapons, and gameplay features for 2026.</p>
                     <p class="source">Gaming Trend</p>
                 </article>
             </div>
@@ -399,6 +434,42 @@
                             Ask
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEARCH MODAL -->
+    <div id="search-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="closeSearchModalOnBackdrop(event)">
+        <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto relative" onclick="event.stopPropagation()">
+            <!-- Close button -->
+            <button onclick="closeSearchModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                ×
+            </button>
+
+            <!-- Modal content -->
+            <div class="p-6">
+                <h2 class="section-header mb-4">Search for a Specific Story</h2>
+                <p class="text-sm text-gray-600 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    Ask about any news topic to get an unbiased, factual summary
+                </p>
+
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="search-modal-input"
+                           placeholder="e.g., tell me about the Venezuelan president kidnapping"
+                           class="flex-1 px-4 py-2 border border-gray-300 rounded"
+                           style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 0.95rem;">
+                    <button id="search-modal-submit-btn"
+                            class="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded font-semibold"
+                            style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                        Search
+                    </button>
+                </div>
+
+                <div id="search-modal-status" class="text-sm text-gray-600 mb-4" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;"></div>
+
+                <div id="search-modal-results">
+                    <!-- Search results appear here -->
                 </div>
             </div>
         </div>
@@ -915,8 +986,259 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeStoryModal();
+                closeSearchModal();
             }
         });
+    });
+
+    // =============================================================================
+    // SEARCH MODAL FUNCTIONALITY
+    // =============================================================================
+
+    let searchModalConversationId = null;
+    let searchModalPollInterval = null;
+    let searchModalProgressInterval = null;
+
+    // Open search modal
+    function openSearchModal() {
+        const modal = document.getElementById('search-modal');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        // Focus the input
+        setTimeout(() => {
+            document.getElementById('search-modal-input')?.focus();
+        }, 100);
+    }
+
+    // Close search modal
+    function closeSearchModal() {
+        const modal = document.getElementById('search-modal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+
+        // Stop polling if active
+        if (searchModalPollInterval) {
+            clearInterval(searchModalPollInterval);
+            searchModalPollInterval = null;
+        }
+
+        // Stop progress messages
+        if (searchModalProgressInterval) {
+            clearInterval(searchModalProgressInterval);
+            searchModalProgressInterval = null;
+        }
+    }
+
+    // Close modal when clicking backdrop
+    function closeSearchModalOnBackdrop(event) {
+        if (event.target.id === 'search-modal') {
+            closeSearchModal();
+        }
+    }
+
+    // Start progress messages for search modal
+    function startSearchModalProgress(elementId) {
+        let messageIndex = 0;
+        const element = document.getElementById(elementId);
+
+        if (!element) return;
+
+        // Update immediately
+        element.textContent = progressMessages[0];
+        element.className = 'text-sm text-blue-600 mb-4';
+
+        // Then rotate every 10 seconds
+        searchModalProgressInterval = setInterval(() => {
+            messageIndex = (messageIndex + 1) % progressMessages.length;
+            if (element) {
+                element.textContent = progressMessages[messageIndex];
+            }
+        }, 10000);
+    }
+
+    // Submit search query from modal
+    async function submitSearchModal() {
+        const input = document.getElementById('search-modal-input');
+        const query = input.value.trim();
+        const statusDiv = document.getElementById('search-modal-status');
+        const resultsDiv = document.getElementById('search-modal-results');
+        const submitBtn = document.getElementById('search-modal-submit-btn');
+
+        if (!query) {
+            statusDiv.textContent = '⚠️ Please enter a question';
+            statusDiv.className = 'text-sm text-red-600 mb-4';
+            return;
+        }
+
+        // Store query for display
+        currentSearchQuery = query;
+
+        // Disable input during processing
+        input.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Searching...';
+
+        // Start progress messages
+        startSearchModalProgress('search-modal-status');
+
+        try {
+            // Submit query
+            const response = await fetch('https://impartial-news-production.up.railway.app/api/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: query,
+                    conversationId: searchModalConversationId
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || data.error || 'Request failed');
+            }
+
+            // Start polling
+            startSearchModalPolling(data.queryId);
+
+        } catch (error) {
+            if (searchModalProgressInterval) {
+                clearInterval(searchModalProgressInterval);
+                searchModalProgressInterval = null;
+            }
+            statusDiv.textContent = '❌ Error: ' + error.message;
+            statusDiv.className = 'text-sm text-red-600 mb-4';
+            input.disabled = false;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Search';
+        }
+    }
+
+    // Poll for search modal results
+    function startSearchModalPolling(queryId) {
+        let attempts = 0;
+        const maxAttempts = 60;
+
+        searchModalPollInterval = setInterval(async () => {
+            attempts++;
+
+            try {
+                const response = await fetch(`https://impartial-news-production.up.railway.app/api/query-status/${queryId}`);
+                const data = await response.json();
+
+                if (data.status === 'complete') {
+                    clearInterval(searchModalPollInterval);
+                    displaySearchModalResult(data.result, data.conversationId);
+                } else if (data.status === 'error') {
+                    clearInterval(searchModalPollInterval);
+                    if (searchModalProgressInterval) {
+                        clearInterval(searchModalProgressInterval);
+                        searchModalProgressInterval = null;
+                    }
+                    const statusDiv = document.getElementById('search-modal-status');
+                    statusDiv.textContent = '❌ ' + (data.error || 'An error occurred');
+                    statusDiv.className = 'text-sm text-red-600 mb-4';
+                    resetSearchModalInputs();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(searchModalPollInterval);
+                    if (searchModalProgressInterval) {
+                        clearInterval(searchModalProgressInterval);
+                        searchModalProgressInterval = null;
+                    }
+                    const statusDiv = document.getElementById('search-modal-status');
+                    statusDiv.textContent = '⏱️ Query timeout - please try again';
+                    statusDiv.className = 'text-sm text-red-600 mb-4';
+                    resetSearchModalInputs();
+                }
+            } catch (error) {
+                clearInterval(searchModalPollInterval);
+                if (searchModalProgressInterval) {
+                    clearInterval(searchModalProgressInterval);
+                    searchModalProgressInterval = null;
+                }
+                const statusDiv = document.getElementById('search-modal-status');
+                statusDiv.textContent = '❌ Error checking status: ' + error.message;
+                statusDiv.className = 'text-sm text-red-600 mb-4';
+                resetSearchModalInputs();
+            }
+        }, 2000);
+    }
+
+    // Display result in search modal
+    function displaySearchModalResult(result, conversationId) {
+        const statusDiv = document.getElementById('search-modal-status');
+        const resultsDiv = document.getElementById('search-modal-results');
+        const input = document.getElementById('search-modal-input');
+
+        // Stop progress messages
+        if (searchModalProgressInterval) {
+            clearInterval(searchModalProgressInterval);
+            searchModalProgressInterval = null;
+        }
+
+        // Update conversation ID for follow-ups
+        searchModalConversationId = conversationId;
+
+        // Clear status
+        statusDiv.textContent = '';
+
+        // Create result HTML
+        const resultHtml = `
+            <div class="news-story" style="padding-top: 1rem; border-top: 2px solid #e5e5e5; margin-top: 1rem;">
+                ${currentSearchQuery ? `
+                <div class="mb-4 pb-3 border-b border-gray-200">
+                    <p class="text-xs text-gray-500 mb-1" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">YOUR QUESTION</p>
+                    <p class="text-sm text-gray-700" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">"${escapeHtml(currentSearchQuery)}"</p>
+                </div>
+                ` : ''}
+                <h3 class="headline" style="font-size: 1.3rem; margin-bottom: 0.75rem;">${escapeHtml(result.headline)}</h3>
+                <div class="blurb" style="white-space: pre-wrap; margin-bottom: 0.75rem;">${escapeHtml(result.summary)}</div>
+                <div class="text-xs text-gray-600 mb-2" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Sources:</strong> ${result.sources.map(s => escapeHtml(s)).join(', ')}
+                </div>
+                <div class="text-xs text-gray-500" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Last Updated:</strong> ${escapeHtml(result.last_updated)}
+                </div>
+                ${result.related_topics && result.related_topics.length > 0 ? `
+                <div class="text-xs text-gray-500 mt-2" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                    <strong>Related:</strong> ${result.related_topics.map(t => escapeHtml(t)).join(', ')}
+                </div>
+                ` : ''}
+            </div>
+        `;
+
+        resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+
+        // Reset inputs for follow-up question
+        input.value = '';
+        input.disabled = false;
+        input.placeholder = 'Ask a follow-up question...';
+
+        const submitBtn = document.getElementById('search-modal-submit-btn');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Search';
+
+        // Focus input for follow-up
+        input.focus();
+    }
+
+    function resetSearchModalInputs() {
+        const input = document.getElementById('search-modal-input');
+        const submitBtn = document.getElementById('search-modal-submit-btn');
+
+        input.disabled = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Search';
+    }
+
+    // Wire up search modal button and input
+    document.getElementById('search-modal-btn')?.addEventListener('click', openSearchModal);
+    document.getElementById('search-modal-submit-btn')?.addEventListener('click', submitSearchModal);
+    document.getElementById('search-modal-input')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            submitSearchModal();
+        }
     });
     </script>
 </body>
