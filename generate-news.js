@@ -312,14 +312,20 @@ function generateHtml(newsData) {
     const createStoryHtml = (story, isTopHeadline = false) => {
       const headlineClass = isTopHeadline ? 'headline top-headline' : 'headline';
 
-      // Store expansion data as JSON in data attribute for client-side access
-      const expansionData = story.expanded_summary ? JSON.stringify({
-        expanded_summary: story.expanded_summary,
-        additional_sources: story.additional_sources || [],
-        related_topics: story.related_topics || []
-      }).replace(/"/g, '&quot;') : '';
+      // Store expansion data as base64-encoded JSON in data attribute for safe HTML embedding
+      let expansionAttr = '';
+      if (story.expanded_summary) {
+        const expansionJson = JSON.stringify({
+          expanded_summary: story.expanded_summary,
+          additional_sources: story.additional_sources || [],
+          related_topics: story.related_topics || []
+        });
+        // Use base64 encoding to safely embed in HTML attribute
+        const expansionBase64 = Buffer.from(expansionJson).toString('base64');
+        expansionAttr = `data-expansion="${expansionBase64}"`;
+      }
 
-      return `                <article class="news-story" ${expansionData ? `data-expansion='${expansionData}'` : ''}>
+      return `                <article class="news-story" ${expansionAttr}>
                     <h3 class="${headlineClass}">${story.headline}</h3>
                     <p class="blurb">${story.blurb}</p>
                     <p class="source">${story.source}</p>
@@ -753,8 +759,22 @@ app.listen(PORT, () => {
 
 // Schedule to run daily at 6 AM PST (2 PM UTC) - FULL MODE
 cron.schedule('0 14 * * *', () => {
-  console.log('Running scheduled news generation (FULL MODE)...');
-  generateNews(false); // false = FULL MODE for scheduled runs
+  console.log('Scheduled generation time reached (6 AM PST)...');
+
+  // Check flag file before running
+  try {
+    const flagContent = fs.readFileSync('./enable-6am-generation.txt', 'utf8').trim().toLowerCase();
+
+    if (flagContent === 'true') {
+      console.log('Flag enabled: Running scheduled news generation (FULL MODE)...');
+      generateNews(false); // false = FULL MODE for scheduled runs
+    } else {
+      console.log('Flag disabled: Skipping scheduled generation to save costs.');
+      console.log('To enable: Change enable-6am-generation.txt to "true"');
+    }
+  } catch (error) {
+    console.error('Error reading generation flag, skipping generation:', error.message);
+  }
 });
 
 // Cleanup expired conversations every 10 minutes

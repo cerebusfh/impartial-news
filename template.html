@@ -689,7 +689,9 @@
         // Check if we have pre-generated expansion data
         if (expansionData) {
             try {
-                const expansion = JSON.parse(expansionData);
+                // Decode base64-encoded JSON
+                const expansionJson = atob(expansionData);
+                const expansion = JSON.parse(expansionJson);
 
                 // Hide loading and show pre-generated content immediately
                 loadingDiv.classList.add('hidden');
