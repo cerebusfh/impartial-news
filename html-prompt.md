@@ -57,13 +57,14 @@ Use this exact structure:
             font-weight: 700;
         }
         
+        p.blurb,
         .blurb {
-            font-size: 0.95rem;
+            font-size: 0.95rem !important;
             line-height: 1.6;
             color: #333;
             margin-bottom: 0.5rem;
-            font-style: normal;
-            font-weight: normal;
+            font-style: normal !important;
+            font-weight: normal !important;
         }
         
         .source {
