@@ -62,6 +62,8 @@ Use this exact structure:
             line-height: 1.6;
             color: #333;
             margin-bottom: 0.5rem;
+            font-style: normal;
+            font-weight: normal;
         }
         
         .source {
