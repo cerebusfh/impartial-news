@@ -3,202 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impartial News - January 8, 2026</title>
+    <title>Impartial News - January 13, 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-        .news-card {
-            background: white;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: shadow 0.3s;
+        /* Classic newspaper typography */
+        body { 
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            background: #fafafa;
+            color: #121212;
         }
-        .news-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .source { font-size: 0.8rem; color: #6b7280; margin-top: 0.75rem; }
+        
+        h1, h2, h3 { 
+            font-family: 'Playfair Display', Georgia, serif;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Newspaper-style layout */
+        .news-story {
+            border-bottom: 1px solid #e5e5e5;
+            padding: 1.25rem 0;
+            transition: background-color 0.2s;
+        }
+        
+        .news-story:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .news-story:last-child {
+            border-bottom: none;
+        }
+        
+        .headline {
+            font-size: 1.25rem;
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+            color: #121212;
+        }
+        
+        .top-headline {
+            font-size: 1.5rem;
+            line-height: 1.2;
+            font-weight: 700;
+        }
+        
+        .blurb {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .source {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .section-header {
+            border-top: 3px double #121212;
+            border-bottom: 1px solid #121212;
+            padding: 0.5rem 0;
+            margin: 2rem 0 1rem 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        header {
+            border-bottom: 3px double #121212;
+            padding: 1.5rem 0;
+            background: white;
+        }
+        
+        .masthead {
+            font-size: 3rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+        
+        .tagline {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+        
+        .date-header {
+            text-align: center;
+            font-size: 0.9rem;
+            margin-top: 0.75rem;
+            color: #121212;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        @media (max-width: 768px) {
+            .masthead { font-size: 2rem; }
+            .top-headline { font-size: 1.25rem; }
+            .headline { font-size: 1.1rem; }
+        }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-50">
-    <header class="bg-indigo-600 text-white p-6">
-        <div class="container mx-auto max-w-6xl">
-            <h1 class="text-3xl font-bold">Impartial News</h1>
-            <p class="text-indigo-200">January 8, 2026 - Factual Headlines</p>
+<body>
+    <header>
+        <div class="container mx-auto max-w-5xl px-4">
+            <h1 class="masthead">IMPARTIAL NEWS</h1>
+            <p class="tagline">"All the News That's Fit to Read"</p>
+            <p class="date-header">January 13, 2026 | Last Updated: January 13, 2026</p>
         </div>
     </header>
 
-    <div class="container mx-auto max-w-6xl px-4 sm:px-6 mt-4">
-        <button disabled class="bg-gray-400 cursor-not-allowed text-white font-semibold py-2 px-6 rounded-lg shadow">
-            🔄 Refresh Temporarily Disabled
+    <div class="container mx-auto max-w-5xl px-4 mt-4 mb-4">
+        <button id="refresh-news-btn" 
+                class="bg-gray-900 hover:bg-gray-800 text-white font-semibold py-2 px-6 rounded text-sm transition duration-150 ease-in-out"
+                style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+            🔄 Update Edition
         </button>
-        <span class="ml-4 text-sm text-amber-600 font-medium">⚠️ Button disabled during cost optimization</span>
         <span id="refresh-status" class="ml-4 text-sm text-gray-600"></span>
     </div>
 
-    <main class="container mx-auto max-w-6xl p-6">
+    <main class="container mx-auto max-w-5xl px-4 bg-white" style="padding-top: 1.5rem; padding-bottom: 3rem;">
         
         <!-- TOP HEADLINES -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-bold mb-4 pb-2 border-b-2 border-indigo-600">Top Headlines</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">US President Announces Venezuela Oil Deal Worth $2.8 Billion</h3>
-                    <p class="text-gray-600 text-sm">The White House announced Venezuela will provide 30-50 million barrels of oil to the US following military operations that captured former President Maduro. Oil companies including Exxon and Chevron are scheduled to meet with officials Friday.</p>
-                    <p class="source">Source: NPR</p>
+        <section class="mb-8">
+            <h2 class="section-header">Top Headlines</h2>
+            <div class="grid md:grid-cols-2 gap-x-8">
+                <article class="news-story">
+                    <h3 class="headline top-headline">Federal Reserve Chair Faces Criminal Investigation by Justice Department</h3>
+                    <p class="blurb"><cite>Federal Reserve Chair Jerome Powell comes under criminal investigation by the administration's Justice Department on Monday</cite>. <cite>The development raises concerns about central bank independence</cite>.</p>
+                    <p class="source">PBS</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">White House Considers Military Options for Greenland Acquisition</h3>
-                    <p class="text-gray-600 text-sm">Administration officials confirmed they are discussing various approaches to acquire Greenland, stating military action remains on the table despite opposition from European allies.</p>
-                    <p class="source">Source: CNN</p>
+                <article class="news-story">
+                    <h3 class="headline top-headline">Minnesota Files Lawsuit Against Federal Immigration Operations</h3>
+                    <p class="blurb"><cite>Minnesota Attorney General Keith Ellison announced a lawsuit Monday against the administration over widespread immigration operations</cite>. <cite>The suit was filed after Illinois and Chicago also sued the administration</cite>.</p>
+                    <p class="source">CNN</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">US Seizes Russian Oil Tanker in North Atlantic</h3>
-                    <p class="text-gray-600 text-sm">Special forces commandeered the Russian-flagged Marinera tanker after a two-week pursuit for sanctions violations. The operation is part of broader enforcement against Venezuela-linked oil shipments.</p>
-                    <p class="source">Source: Al Jazeera</p>
+                <article class="news-story">
+                    <h3 class="headline top-headline">Iranian Protests Continue as Death Toll Rises</h3>
+                    <p class="blurb"><cite>Hundreds of protesters have been killed in Iran, according to rights groups</cite>. <cite>Protests continue to grow despite the regime's crackdown on dissent</cite>.</p>
+                    <p class="source">NPR</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Federal Government Resumes Normal Operations After Funding Extension</h3>
-                    <p class="text-gray-600 text-sm">The US President signed a continuing resolution extending government funding through January 30th, ending concerns over a potential shutdown.</p>
-                    <p class="source">Source: Treasury Department</p>
+                <article class="news-story">
+                    <h3 class="headline top-headline">IRS Announces 2026 Tax Filing Season Opens January 26</h3>
+                    <p class="blurb"><cite>The Internal Revenue Service announced Monday, January 26, 2026, as the opening of the nation's 2026 filing season</cite>. <cite>Taxpayers have until Wednesday, April 15, 2026, to file their 2025 tax returns</cite>.</p>
+                    <p class="source">IRS</p>
                 </article>
             </div>
         </section>
 
         <!-- U.S. NEWS -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-bold mb-4 pb-2 border-b-2 border-indigo-600">U.S. News</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Representative Announces Challenge to Presidential Authority</h3>
-                    <p class="text-gray-600 text-sm">A Democratic lawmaker declared their intention to oppose what they termed threats to constitutional governance, calling for resistance to executive power overreach.</p>
-                    <p class="source">Source: NBC News</p>
+        <section class="mb-8">
+            <h2 class="section-header">United States</h2>
+            <div>
+                <article class="news-story">
+                    <h3 class="headline">Justice Department Opens Investigation Into Fed Chair</h3>
+                    <p class="blurb"><cite>The administration's Justice Department launches an unprecedented investigation into Federal Reserve Chair Jerome Powell</cite>. <cite>Officials say the intimidation threatens economic stability</cite>.</p>
+                    <p class="source">PBS</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Former January 6th Defendants Call for Media Accountability</h3>
-                    <p class="text-gray-600 text-sm">Pardoned individuals gathered at the White House to demand consequences for prosecutors and journalists involved in previous legal proceedings.</p>
-                    <p class="source">Source: NBC News</p>
+                <article class="news-story">
+                    <h3 class="headline">Additional Federal Agents Deployed to Minnesota</h3>
+                    <p class="blurb"><cite>The administration will send hundreds of additional federal agents to Minnesota</cite>. <cite>More than 2,000 federal immigration agents are already in Minnesota</cite>.</p>
+                    <p class="source">NPR</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Special Election Set for Georgia Congressional Seat</h3>
-                    <p class="text-gray-600 text-sm">Governor Brian Kemp scheduled a March 10th special election to fill a vacant House seat, with nearly two dozen candidates expected to compete.</p>
-                    <p class="source">Source: NBC News</p>
+                <article class="news-story">
+                    <h3 class="headline">Federal Judge Orders Restoration of Pediatric Funding</h3>
+                    <p class="blurb"><cite>A judge ordered the restoration of nearly $12 million in funding to the American Academy of Pediatrics</cite>. The funding includes money for rural health care and disability identification programs.</p>
+                    <p class="source">NPR</p>
                 </article>
             </div>
         </section>
 
         <!-- WORLD NEWS -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-bold mb-4 pb-2 border-b-2 border-indigo-600">World News</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">European Leaders Defend Greenland Sovereignty Against US Claims</h3>
-                    <p class="text-gray-600 text-sm">France, Germany, Italy, Poland, Spain and UK joined Denmark in issuing a joint statement declaring 'Greenland belongs to its people' amid territorial acquisition discussions.</p>
-                    <p class="source">Source: NPR</p>
+        <section class="mb-8">
+            <h2 class="section-header">World</h2>
+            <div>
+                <article class="news-story">
+                    <h3 class="headline">UN Reports Global Economic Growth Expected at 2.7%</h3>
+                    <p class="blurb"><cite>Global economic output is forecast to grow by 2.7 per cent in 2026, according to the World Economic Situation and Prospects 2026 released by the United Nations on January 8</cite>.</p>
+                    <p class="source">UN</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">UN Security Council Holds Emergency Session on Venezuela</h3>
-                    <p class="text-gray-600 text-sm">Secretary-General António Guterres warned the US military action sets a dangerous precedent for world order, calling for respect for national sovereignty.</p>
-                    <p class="source">Source: UN News</p>
+                <article class="news-story">
+                    <h3 class="headline">Bulgaria Adopts Euro Currency</h3>
+                    <p class="blurb"><cite>Bulgaria adopts the euro, replacing the lev, becoming the 21st member of the eurozone</cite>. The transition marks a significant milestone for the European Union.</p>
+                    <p class="source">Reuters</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Ukraine Allies Agree on Multilayered Defense Guarantees</h3>
-                    <p class="text-gray-600 text-sm">International partners announced comprehensive security arrangements as part of a proposal to end Russia's nearly four-year invasion of Ukraine.</p>
-                    <p class="source">Source: NPR</p>
+                <article class="news-story">
+                    <h3 class="headline">Malaysia and Indonesia Block AI Chatbot Grok</h3>
+                    <p class="blurb"><cite>Malaysia and Indonesia have become the first countries to block Grok, the artificial intelligence chatbot developed by Elon Musk's xAI</cite>. Authorities said it was being misused to generate sexually explicit images.</p>
+                    <p class="source">NPR</p>
                 </article>
             </div>
         </section>
 
         <!-- BUSINESS -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-bold mb-4 pb-2 border-b-2 border-indigo-600">Business</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Stock Markets Hit New Records Despite Mixed Economic Signals</h3>
-                    <p class="text-gray-600 text-sm">The S&P 500 achieved its second record high of 2026 while oil prices fell on Ukraine peace talks. Energy stocks surged on Venezuela developments.</p>
-                    <p class="source">Source: Bloomberg</p>
+        <section class="mb-8">
+            <h2 class="section-header">Business</h2>
+            <div>
+                <article class="news-story">
+                    <h3 class="headline">Stock Markets Navigate Mixed Performance After Holidays</h3>
+                    <p class="blurb"><cite>US stocks edged higher on Friday, as investors started 2026 on cautious footing following strong equity performance while keeping an eye on rising Treasury yields</cite>.</p>
+                    <p class="source">Bloomberg</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Silver Reaches Historic $80 Per Ounce Milestone</h3>
-                    <p class="text-gray-600 text-sm">Precious metals extended gains with silver climbing 4.4% to breach the $80 threshold for the first time, building on 2025's 140% annual increase.</p>
-                    <p class="source">Source: CNBC</p>
+                <article class="news-story">
+                    <h3 class="headline">US Jobs Report Shows Economy Added 50,000 Positions</h3>
+                    <p class="blurb"><cite>Payroll growth undershot expectations, and downward revisions to prior months have pushed the three-month moving average into negative territory</cite>. The report confirms labor market challenges continue.</p>
+                    <p class="source">CNN</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Mortgage Rates Hold Steady as Fed Cuts Expected</h3>
-                    <p class="text-gray-600 text-sm">The average 30-year mortgage rate remained at 5.99% while experts predict potential decreases throughout 2026 based on Federal Reserve policy expectations.</p>
-                    <p class="source">Source: CBS News</p>
+                <article class="news-story">
+                    <h3 class="headline">NTT DATA Named Leader in Data Center Services</h3>
+                    <p class="blurb"><cite>NTT DATA announced January 9, 2026, that it has been named a Leader in the IDC MarketScape: Worldwide Datacenter Colocation Services 2025 Vendor Assessment for the fourth time</cite>.</p>
+                    <p class="source">NTT DATA</p>
                 </article>
             </div>
         </section>
 
         <!-- SPORTS -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-bold mb-4 pb-2 border-b-2 border-indigo-600">Sports</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">NFL Wild Card Weekend Kicks Off Saturday</h3>
-                    <p class="text-gray-600 text-sm">Playoff action begins with six games over three days, featuring matchups including Bills at Jaguars and Packers at Bears. The Super Bowl is scheduled for February 8th in Santa Clara.</p>
-                    <p class="source">Source: CBS Sports</p>
+        <section class="mb-8">
+            <h2 class="section-header">Sports</h2>
+            <div>
+                <article class="news-story">
+                    <h3 class="headline">NFL Playoffs Begin With Wide-Open Championship Field</h3>
+                    <p class="blurb"><cite>With the Kansas City Chiefs missing the playoffs for the first time in the Patrick Mahomes era, every team sees this as a prime opportunity</cite>. <cite>Fourteen teams compete for Super Bowl 60</cite>.</p>
+                    <p class="source">Yahoo Sports</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Chiefs Miss Playoffs for First Time in Mahomes Era</h3>
-                    <p class="text-gray-600 text-sm">Kansas City failed to qualify for postseason play for the first time since Patrick Mahomes became starting quarterback, opening opportunities for other AFC teams.</p>
-                    <p class="source">Source: Fox Sports</p>
+                <article class="news-story">
+                    <h3 class="headline">US Figure Skating Team Selected for 2026 Olympics</h3>
+                    <p class="blurb"><cite>Sixteen US figure skaters are competing in all four Olympic disciplines: men's, women's, pairs and ice dance. The team includes a mix of seasoned vets, world champions and rising stars</cite>.</p>
+                    <p class="source">NPR</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Montana State and Illinois State Advance to FCS Championship</h3>
-                    <p class="text-gray-600 text-sm">The two teams secured spots in Monday's FCS Championship Game at FirstBank Stadium in Nashville after semifinal victories over Montana and Villanova respectively.</p>
-                    <p class="source">Source: NCAA</p>
+                <article class="news-story">
+                    <h3 class="headline">Hawaii High School Basketball Scores Reported</h3>
+                    <p class="blurb"><cite>Kamehameha-Hawaii defeated Honokaa 8-0 in high school soccer action</cite>. Multiple local basketball games are scheduled for Monday evening across Hawaii.</p>
+                    <p class="source">Honolulu Star-Advertiser</p>
                 </article>
             </div>
         </section>
 
         <!-- ENTERTAINMENT -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-bold mb-4 pb-2 border-b-2 border-indigo-600">Entertainment</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Critics Choice Awards Names Best Picture Winner</h3>
-                    <p class="text-gray-600 text-sm">'One Battle After Another' won best picture at Sunday's ceremony, with Paul Thomas Anderson taking best director. 'Sinners' earned four awards including best casting.</p>
-                    <p class="source">Source: Hollywood Reporter</p>
+        <section class="mb-8">
+            <h2 class="section-header">Arts & Entertainment</h2>
+            <div>
+                <article class="news-story">
+                    <h3 class="headline">Golden Globes Awards Ceremony Highlights 2026 Season</h3>
+                    <p class="blurb"><cite>At the first major awards show of the season, 'One Battle After Another' and 'Adolescence' both won four awards. In a surprise win, 'Hamnet' upset 'Sinners' for best motion picture</cite>.</p>
+                    <p class="source">CBS</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Golden Globes Set for Sunday Night Ceremony</h3>
-                    <p class="text-gray-600 text-sm">Nikki Glaser returns as host for the 83rd annual awards at the Beverly Hilton. 'One Battle After Another' leads film nominations with nine total nods.</p>
-                    <p class="source">Source: Yahoo Entertainment</p>
+                <article class="news-story">
+                    <h3 class="headline">Critics Choice Awards Red Carpet Features Major Stars</h3>
+                    <p class="blurb"><cite>The Critics Choice Awards kick off the 2026 season January 4 with Jessica Biel, Elle Fanning, Kristen Bell and Ariana Grande working the carpet</cite>.</p>
+                    <p class="source">E! Online</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">Art Directors Guild Announces 2026 Award Nominees</h3>
-                    <p class="text-gray-600 text-sm">Taylor Swift, Sabrina Carpenter, and Lady Gaga received nominations for their music videos. The guild celebrates 30 years of production design excellence.</p>
-                    <p class="source">Source: Hollywood Reporter</p>
+                <article class="news-story">
+                    <h3 class="headline">Netflix-Paramount Battle Over Warner Bros Discovery Continues</h3>
+                    <p class="blurb"><cite>The largest media deal in recent years involves a tug-of-war between Netflix and Paramount over the purchase of Warner Bros Discovery</cite>. Netflix appears poised to win with its $83 billion offer.</p>
+                    <p class="source">NPR</p>
                 </article>
             </div>
         </section>
 
         <!-- GAMING -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-bold mb-4 pb-2 border-b-2 border-indigo-600">Gaming</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">VR Studio Cloudhead Games Cuts 70 Percent of Workforce</h3>
-                    <p class="text-gray-600 text-sm">The Pistol Whip developer announced major layoffs citing industry downturn and VR market challenges. CEO described facing 'industry forces beyond our control.'</p>
-                    <p class="source">Source: Game Developer</p>
+        <section class="mb-8">
+            <h2 class="section-header">Technology & Gaming</h2>
+            <div>
+                <article class="news-story">
+                    <h3 class="headline">PlayStation Plus Essential January 2026 Games Available Now</h3>
+                    <p class="blurb"><cite>The first PS Plus Essential games of 2026 are here, adding another trio of PS5 and PS4 titles to members. January's lineup is available to claim right now</cite>.</p>
+                    <p class="source">Push Square</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">EA Shuts Down Three Games Including Anthem</h3>
-                    <p class="text-gray-600 text-sm">Electronic Arts will close servers for Anthem, The Sims Mobile, and NBA Live 19 throughout January, with Real Racing 3 following in March due to declining player numbers.</p>
-                    <p class="source">Source: Shane the Gamer</p>
+                <article class="news-story">
+                    <h3 class="headline">GeForce NOW Adds 14 New Games in January</h3>
+                    <p class="blurb"><cite>GeForce NOW is kicking off 2026 by looking back at an unforgettable year of wins and wildly high frame rates</cite>. The service now features RTX 5080-powered cloud gaming.</p>
+                    <p class="source">NVIDIA</p>
                 </article>
-                <article class="news-card">
-                    <h3 class="text-lg font-semibold mb-2">GPU Prices Expected to Surge Due to AI Demand</h3>
-                    <p class="text-gray-600 text-sm">Reports suggest the RTX 5090 could increase from $2000 to $5000 by year's end as AI datacenters drive up demand for graphics processing units and memory components.</p>
-                    <p class="source">Source: Goonhammer</p>
+                <article class="news-story">
+                    <h3 class="headline">Sega Co-Founder David Rosen Dies at Age 95</h3>
+                    <p class="blurb"><cite>Sega co-founder David Rosen passed away on Christmas Day, aged 95. Rosen was instrumental in transforming Sega into the video game giant, dominating arcade sector in the 1980s</cite>.</p>
+                    <p class="source">Time Extension</p>
                 </article>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-gray-800 text-gray-300 p-6 mt-10 text-center">
-        <p>&copy; 2026 Impartial News Aggregator</p>
+    <footer class="bg-gray-900 text-gray-400 py-6 mt-8 text-center" style="font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+        <div class="container mx-auto max-w-5xl px-4">
+            <p class="text-sm">&copy; 2026 Impartial News Aggregator</p>
+            <p class="text-xs mt-2">Curated by artificial intelligence | Updated daily at 6:00 AM PST</p>
+        </div>
     </footer>
 
     <script>
@@ -221,7 +321,7 @@
         } catch (error) {
             status.textContent = '❌ Error: ' + error.message;
             btn.disabled = false;
-            btn.textContent = '🔄 Refresh News Now';
+            btn.textContent = '🔄 Update Edition';
         }
     });
     </script>
