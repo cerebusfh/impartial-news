@@ -13,50 +13,49 @@ You are a news researcher. Search the web comprehensively for current news stori
 
 **IMPORTANT:** Include "[MONTH_YEAR]" or "today" in your searches to get fresh results, not cached ones.
 
-### Search Mode Instructions
-
-**IF YOU SEE "QUICK MODE" APPENDED AT THE END OF THIS PROMPT:**
-- **CRITICAL RATE LIMIT RULE**: Perform ONLY **1 search per category** = **7 searches TOTAL**
-- Use only the first/primary search query listed for each category below
-- Skip all additional searches to avoid hitting API rate limits
-- You must work with limited data - do your best with what you find
-
-**OTHERWISE (FULL MODE - default):**
-- Perform **5-10 comprehensive searches per category** for thorough coverage
-- Use the suggested searches below as starting points, then follow up with targeted searches
-- Examples: Search for specific regions, specific topics, follow-up on breaking stories
-- Take your time - pace searches to avoid rate limits (you have plenty of time at 6 AM)
-
-### Primary Search Queries (Use ALL for FULL mode, ONLY FIRST for QUICK mode)
-
+**FULL MODE - Comprehensive coverage:**
+Conduct thorough web searches for:
 1. **Top Headlines** - Major breaking news, government actions, Supreme Court rulings
-   - Primary: "breaking news [MONTH_YEAR]"
-   - Additional (Full mode): "major news today [MONTH_YEAR]", "top stories [MONTH_YEAR]", "government news today", etc.
-
+   - Search: "breaking news [MONTH_YEAR]"
+   - Search: "major news today [MONTH_YEAR]"
+   
 2. **U.S. News** - Domestic policy, federal agencies, major court cases
-   - Primary: "US news today [MONTH_YEAR]"
-   - Additional (Full mode): "federal government news [MONTH_YEAR]", "domestic policy [MONTH_YEAR]", "US court rulings today", etc.
-
+   - Search: "US news today [MONTH_YEAR]"
+   - Search: "federal government news [MONTH_YEAR]"
+   
 3. **World News** - International events, diplomatic developments, conflicts
-   - Primary: "world news [MONTH_YEAR]"
-   - Additional (Full mode): "international news today", "global news [MONTH_YEAR]", "diplomatic developments [MONTH_YEAR]", etc.
-
+   - Search: "world news [MONTH_YEAR]"
+   - Search: "international news today"
+   
 4. **Business** - Economic indicators, corporate news, market movements
-   - Primary: "business news [MONTH_YEAR]"
-   - Additional (Full mode): "stock market today", "economic news [MONTH_YEAR]", "corporate earnings today", "Fed interest rates", etc.
-
+   - Search: "business news [MONTH_YEAR]"
+   - Search: "stock market today"
+   
 5. **Sports** - Championships, playoffs, major tournaments HAPPENING NOW or in the LAST 24 HOURS
-   - Primary: "sports scores today [MONTH_YEAR]"
-   - Additional (Full mode): "sports news [MONTH_YEAR]", "NFL today", "NBA scores", "soccer results today", etc.
+   - Search: "sports scores today [MONTH_YEAR]"
+   - Search: "sports news [MONTH_YEAR]"
    - **CRITICAL:** Verify the event happened YESTERDAY or TODAY. Do NOT include preview/upcoming game stories.
-
+   
 6. **Entertainment** - New releases, awards, industry announcements from the LAST 24 HOURS
-   - Primary: "entertainment news [MONTH_YEAR]"
-   - Additional (Full mode): "movie news today", "music releases [MONTH_YEAR]", "Hollywood news today", "streaming news", etc.
-
+   - Search: "entertainment news [MONTH_YEAR]"
+   - Search: "movie news today"
+   
 7. **Gaming** - Video game releases, esports, industry news from the LAST 24 HOURS
-   - Primary: "gaming news [MONTH_YEAR]"
-   - Additional (Full mode): "video game industry news today", "esports today", "game releases [MONTH_YEAR]", "gaming industry [MONTH_YEAR]", etc.
+   - Search: "gaming news [MONTH_YEAR]"
+   - Search: "video game industry news today"
+
+**QUICK MODE - Cost-optimized (when specified):**
+Conduct MINIMAL targeted searches (maximum 10 total):
+1. Search: "breaking news today [MONTH_YEAR]" - for Top Headlines
+2. Search: "major news [MONTH_YEAR]" - for Top Headlines
+3. Search: "US news [MONTH_YEAR]" - for US News
+4. Search: "world news [MONTH_YEAR]" - for World News  
+5. Search: "business news [MONTH_YEAR]" - for Business
+6. Search: "sports today [MONTH_YEAR]" - for Sports
+7. Search: "entertainment news [MONTH_YEAR]" - for Entertainment
+8. Search: "gaming news [MONTH_YEAR]" - for Gaming
+
+**REUSE information from earlier searches** when possible instead of doing additional searches. Be efficient with search queries to reduce token costs.
 
 ## Strict Recency Requirements - READ CAREFULLY
 
@@ -197,7 +196,7 @@ Return JSON in this exact structure:
 
 ## Story Count Requirements - CRITICAL
 
-**IF YOU SEE "QUICK MODE" APPENDED AT THE END OF THIS PROMPT:**
+**FULL MODE (comprehensive):**
 - **Top Headlines**: EXACTLY 4 stories (required for balanced 2-column layout)
 - **U.S. News**: 3 stories
 - **World News**: 3 stories
@@ -205,19 +204,17 @@ Return JSON in this exact structure:
 - **Sports**: 3 stories
 - **Entertainment**: 3 stories
 - **Gaming**: 3 stories
-- **Total: 21 stories**
 
-**OTHERWISE (FULL MODE - default):**
-- **Top Headlines**: EXACTLY 4 stories (required for balanced 2-column layout)
-- **U.S. News**: 4 stories (2x2 column layout)
-- **World News**: 4 stories (2x2 column layout)
-- **Business**: 4 stories (2x2 column layout)
-- **Sports**: 4 stories (2x2 column layout)
-- **Entertainment**: 4 stories (2x2 column layout)
-- **Gaming**: 4 stories (2x2 column layout)
-- **Total: 28 stories**
+**QUICK MODE (cost-optimized):**
+- **Top Headlines**: 3 stories
+- **U.S. News**: 2 stories
+- **World News**: 2 stories
+- **Business**: 2 stories
+- **Sports**: 2 stories
+- **Entertainment**: 2 stories
+- **Gaming**: 2 stories
 
-If you cannot find enough suitable stories for any category, expand your search or include slightly older but still newsworthy stories from the last 48 hours.
+If you cannot find enough suitable stories for Top Headlines, promote the most newsworthy story from another category.
 
 ## Source Quality
 
@@ -256,6 +253,7 @@ Before submitting your research, verify EACH story:
 2. ✅ Headline is neutral and factual (8-15 words)
 3. ✅ No inflammatory language, threats, or warnings in headline or blurb
 4. ✅ Source is reputable
-5. ✅ Story counts match the mode requirements (3 or 4 per category depending on QUICK vs FULL)
+5. ✅ Top Headlines has EXACTLY 4 stories
+6. ✅ All other categories have 3 stories each
 
 **Now search the web thoroughly and return the JSON data.**

@@ -192,3 +192,106 @@ Before any generation:
 - **Developer**: cerebusfh
 - **Claude Model**: claude-sonnet-4-20250514
 - **Last Updated**: January 2026
+
+## Cost Management
+
+### The January 9, 2026 Incident
+
+On January 9th, the system consumed approximately **22.5 million tokens** ($60-80) in a single day due to:
+- 473 web searches (normal is ~10-30 per run)
+- Multiple generation runs (likely ~19 attempts)
+- Web search results consuming massive tokens
+
+This incident led to implementing strict cost controls.
+
+### Current Cost Structure
+
+**Estimated Costs Per Run:**
+- QUICK mode: ~$0.30 (8-10 searches, Haiku for HTML)
+- FULL mode: ~$0.50 (20-30 searches, Haiku for HTML)
+
+**Expected Monthly Costs:**
+- Daily cron job (FULL mode): $0.50/day × 30 = **$15/month**
+- Manual refreshes (rate limited): $0.30 × 5/month = **$1.50/month**
+- **Total: ~$16-20/month**
+
+### Cost Reduction Measures Implemented
+
+#### 1. Rate Limiting
+- **Manual /generate endpoint**: Max 1 request per hour
+- **Scheduled cron job**: Max 1 request per 24 hours
+- Prevents concurrent runs
+- Returns clear error messages when rate limited
+
+#### 2. Token Usage Reduction
+- Switched HTML generation from Sonnet to **Haiku** (5x cheaper)
+- Reduced max_tokens: QUICK=8k, FULL=12k (from 12k/16k)
+- QUICK mode: Max 10 total searches (from unlimited)
+- QUICK mode: Reduced story counts (3/2/2 vs 4/3/3)
+
+#### 3. Usage Logging System
+- All generation attempts logged to `usage-log.txt` and `usage-log.json`
+- Tracks: timestamp, mode, success/failure, estimated cost
+- Cost summary available via `/costs` endpoint
+- Displayed on server startup
+
+#### 4. Model Selection
+- **Research phase**: Sonnet 4.5 (needs quality for web search analysis)
+- **HTML generation**: Haiku 4.5 (simple template filling, 5x cheaper)
+
+### Monitoring
+
+**Check costs regularly:**
+```bash
+# Via API endpoint
+curl https://impartial-news-production.up.railway.app/costs
+
+# Via Anthropic Console
+https://console.anthropic.com/settings/usage
+```
+
+**Review logs:**
+```bash
+# On Railway, check:
+cat usage-log.txt
+```
+
+### Spending Alerts
+
+**Set up in Anthropic Console:**
+1. Go to Settings → Billing
+2. Set monthly limit: $20
+3. Enable email alerts at 50%, 80%, 100%
+
+### If Costs Spike Again
+
+**Immediate actions:**
+1. Check Railway logs for error loops or retries
+2. Verify rate limiting is working
+3. Check `/health` endpoint for unusual activity
+4. Review `usage-log.json` for patterns
+
+**Long-term solutions:**
+- Cache generated news for 6-12 hours
+- Implement smarter search result reuse
+- Consider alternative news APIs instead of web search
+
+### Cost Optimization Roadmap
+
+**Phase 1 (Completed):**
+- ✅ Rate limiting
+- ✅ Usage logging
+- ✅ Haiku for HTML
+- ✅ Reduced token limits
+
+**Phase 2 (Future):**
+- [ ] Cache news data (reduce regenerations)
+- [ ] Smart search result reuse across categories
+- [ ] Implement story deduplication
+- [ ] Consider RSS feeds or news APIs as supplementary sources
+
+**Phase 3 (Future):**
+- [ ] A/B test Haiku for research phase (quality vs cost tradeoff)
+- [ ] Implement tiered generation (light/medium/full)
+- [ ] Add cost prediction before generation
+- [ ] User-facing cost transparency
