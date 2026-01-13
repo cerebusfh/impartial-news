@@ -134,8 +134,8 @@ async function researchNews(quickMode = false) {
     const researchPrompt = getResearchPrompt(quickMode);
     
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',  // Keep Sonnet for research (needs quality)
-      max_tokens: quickMode ? 8000 : 12000,  // Reduced from 12k/16k
+      model: quickMode ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-20250514',  // Haiku for QUICK, Sonnet for FULL
+      max_tokens: quickMode ? 6000 : 12000,  // Reduced for QUICK mode
       tools: [
         {
           type: 'web_search_20250305',

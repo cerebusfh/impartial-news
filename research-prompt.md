@@ -45,17 +45,18 @@ Conduct thorough web searches for:
    - Search: "video game industry news today"
 
 **QUICK MODE - Cost-optimized (when specified):**
-Conduct MINIMAL targeted searches (maximum 10 total):
-1. Search: "breaking news today [MONTH_YEAR]" - for Top Headlines
-2. Search: "major news [MONTH_YEAR]" - for Top Headlines
-3. Search: "US news [MONTH_YEAR]" - for US News
-4. Search: "world news [MONTH_YEAR]" - for World News  
-5. Search: "business news [MONTH_YEAR]" - for Business
-6. Search: "sports today [MONTH_YEAR]" - for Sports
-7. Search: "entertainment news [MONTH_YEAR]" - for Entertainment
-8. Search: "gaming news [MONTH_YEAR]" - for Gaming
+**ABSOLUTE MAXIMUM: 8 SEARCHES TOTAL. DO NOT EXCEED THIS LIMIT.**
 
-**REUSE information from earlier searches** when possible instead of doing additional searches. Be efficient with search queries to reduce token costs.
+You must be extremely efficient. Conduct ONLY these searches:
+1. Search: "breaking news today [MONTH_YEAR]" - USE for Top Headlines, US News, World News
+2. Search: "business news [MONTH_YEAR]" - USE for Business
+3. Search: "sports results today [MONTH_YEAR]" - USE for Sports
+4. Search: "entertainment news today [MONTH_YEAR]" - USE for Entertainment  
+5. Search: "gaming news today [MONTH_YEAR]" - USE for Gaming
+
+STOP AFTER 8 SEARCHES. If you need more information, REUSE results from previous searches instead of searching again. Extract multiple stories from each search result.
+
+**CRITICAL**: You will be penalized for exceeding 8 searches. This is a hard limit for cost control.
 
 ## Strict Recency Requirements - READ CAREFULLY
 
@@ -206,9 +207,9 @@ Return JSON in this exact structure:
 - **Gaming**: 3 stories
 
 **QUICK MODE (cost-optimized):**
-- **Top Headlines**: 3 stories
-- **U.S. News**: 2 stories
-- **World News**: 2 stories
+- **Top Headlines**: 2-3 stories (extract from first search)
+- **U.S. News**: 2 stories (extract from first search)
+- **World News**: 2 stories (extract from first search)
 - **Business**: 2 stories
 - **Sports**: 2 stories
 - **Entertainment**: 2 stories

@@ -3,8 +3,8 @@ const path = require('path');
 
 // Cost estimates per generation type (in USD)
 const COST_ESTIMATES = {
-  QUICK: 0.30,  // Reduced searches, Haiku for HTML
-  FULL: 0.80    // Full searches, Haiku for HTML
+  QUICK: 0.15,  // Haiku for both research and HTML - ultra cheap
+  FULL: 0.50    // Sonnet for research, Haiku for HTML
 };
 
 // Log file path
