@@ -235,8 +235,23 @@ async function generateHtml(newsData) {
     
     // POST-PROCESSING: Fix issues that Haiku introduces
     
-    // 1. Remove any CSS that sets .blurb to italic (Haiku keeps adding this)
-    htmlContent = htmlContent.replace(/\.blurb\s*{[^}]*font-style:\s*italic[^}]*}/gi, '');
+    // 1. Remove ANY CSS rule that sets font-style to italic (multiple approaches)
+    // Remove .blurb rules with italic
+    htmlContent = htmlContent.replace(/\.blurb\s*\{[^}]*font-style:\s*italic[^}]*\}/gi, '');
+    
+    // Remove p.blurb rules with italic
+    htmlContent = htmlContent.replace(/p\.blurb\s*\{[^}]*font-style:\s*italic[^}]*\}/gi, '');
+    
+    // Nuclear option: add inline override in style section
+    if (htmlContent.includes('</style>')) {
+      const forceNormalStyle = `
+        .blurb, p.blurb { 
+          font-style: normal !important; 
+          font-weight: normal !important;
+        }
+      </style>`;
+      htmlContent = htmlContent.replace('</style>', forceNormalStyle);
+    }
     
     // 2. Ensure timestamp has proper format (date + time)
     const timestamp = new Date().toLocaleString('en-US', { 

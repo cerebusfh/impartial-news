@@ -90,6 +90,29 @@ For each story:
 - **Confirm recency** - Events from last 24-48 hours only
 - **Extract key facts** - Who, what, when, where (verifiable details only)
 - **Remove loaded language** - Strip emotional adjectives, sensational terms
+
+### Name Handling Rules - CRITICAL
+
+**REMOVE ALL POLITICIAN NAMES - Replace with titles:**
+- "Donald Trump" → "US President" or "President"
+- "Joe Biden" → "former President"
+- Any Senator/Representative → "Senator" or "Representative" (add state if relevant: "Florida Senator")
+- Any Governor → "Governor" or "[State] Governor"
+- Foreign leaders → "[Country] President/Prime Minister/Leader"
+
+**KEEP these names:**
+- Athletes (in sports stories)
+- Entertainers, actors, musicians (in entertainment stories)
+- Business leaders, CEOs (in business stories)
+- Victims or key figures in major news events (when identity is central to the story)
+
+**Examples:**
+- ❌ BAD: "Trump announces new policy"
+- ✅ GOOD: "US President announces new policy"
+- ❌ BAD: "Senator Warren criticizes administration"
+- ✅ GOOD: "Massachusetts Senator criticizes administration"
+- **Extract key facts** - Who, what, when, where (verifiable details only)
+- **Remove loaded language** - Strip emotional adjectives, sensational terms
 - **Handle names properly**:
   - REMOVE: Politician names (replace with titles like "US President", "Senator")
   - KEEP: Athletes, entertainers, business leaders (when relevant)
