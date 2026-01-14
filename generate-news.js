@@ -233,13 +233,32 @@ async function generateHtml(newsData) {
     
     console.log('Final HTML length:', htmlContent.length);
     
-    // Add timestamp to HTML
+    // POST-PROCESSING: Fix issues that Haiku introduces
+    
+    // 1. Remove any CSS that sets .blurb to italic (Haiku keeps adding this)
+    htmlContent = htmlContent.replace(/\.blurb\s*{[^}]*font-style:\s*italic[^}]*}/gi, '');
+    
+    // 2. Ensure timestamp has proper format (date + time)
     const timestamp = new Date().toLocaleString('en-US', { 
       timeZone: 'America/Los_Angeles',
-      dateStyle: 'medium',
-      timeStyle: 'short'
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
     });
-    htmlContent = htmlContent.replace('[TIMESTAMP]', timestamp);
+    
+    // Replace [TIMESTAMP] with properly formatted timestamp
+    htmlContent = htmlContent.replace(/\[TIMESTAMP\]/g, timestamp);
+    
+    // Also replace if Haiku already replaced it with just a date
+    htmlContent = htmlContent.replace(
+      /(Last Updated:\s*)([A-Z][a-z]+\s+\d+,\s+\d{4})(?!\s*,)/g, 
+      `$1${timestamp}`
+    );
+    
+    console.log('Post-processing complete. Timestamp:', timestamp);
     
     return htmlContent;
     
