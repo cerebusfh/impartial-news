@@ -443,25 +443,26 @@ app.listen(PORT, () => {
   displayCostSummary();
 });
 
+// DISABLED: Using external cron-job.org instead to avoid conflicts
 // Schedule to run daily at 6 AM PST (2 PM UTC) - FULL MODE
-cron.schedule('0 14 * * *', () => {
-  const now = Date.now();
-  const timeSinceLastRun = now - lastCronRun;
-  
+// cron.schedule('0 14 * * *', () => {
+//   const now = Date.now();
+//   const timeSinceLastRun = now - lastCronRun;
+//   
   // Safety check: prevent duplicate cron runs
-  if (timeSinceLastRun < RATE_LIMITS.CRON_MIN_INTERVAL) {
-    console.log('⏱️  Skipping cron run - too soon since last run');
-    return;
-  }
-  
-  console.log('⏰ Running scheduled news generation (FULL MODE)...');
-  lastCronRun = now;
-  generateNews(false, 'cron').catch(err => {
-    console.error('Scheduled generation error:', err);
-  });
-});
+//   if (timeSinceLastRun < RATE_LIMITS.CRON_MIN_INTERVAL) {
+//     console.log('⏱️  Skipping cron run - too soon since last run');
+//     return;
+//   }
+//   
+//   console.log('⏰ Running scheduled news generation (FULL MODE)...');
+//   lastCronRun = now;
+//   generateNews(false, 'cron').catch(err => {
+//     console.error('Scheduled generation error:', err);
+//   });
+// });
 
 // Keep the process alive
-console.log('News generator started. Will run daily at 6 AM PST (2 PM UTC).');
-console.log('Next scheduled run at 6 AM PST.');
+// console.log('News generator started. Will run daily at 6 AM PST (2 PM UTC).');
+// console.log('Next scheduled run at 6 AM PST.');
 console.log('Manual generation available at /generate endpoint (QUICK MODE, rate limited)\n');
